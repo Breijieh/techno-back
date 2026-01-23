@@ -174,3 +174,5 @@ mvnw clean package
 
 **Version:** 1.0.0  
 **Last Updated:** November 2025
+
+![Deploy Backend](https://github.com/Breijieh/techno-back/actions/workflows/deploy.yml/badge.svg)
