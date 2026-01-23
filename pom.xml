@@ -139,19 +139,6 @@
 			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- ByteBuddy for Java 25 compatibility with Mockito -->
-		<dependency>
-			<groupId>net.bytebuddy</groupId>
-			<artifactId>byte-buddy</artifactId>
-			<version>1.15.11</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.bytebuddy</groupId>
-			<artifactId>byte-buddy-agent</artifactId>
-			<version>1.15.11</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Phase 9: Email Support for Notifications -->
 		<dependency>
