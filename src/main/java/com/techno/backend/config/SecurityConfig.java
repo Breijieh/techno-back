@@ -72,7 +72,8 @@ public class SecurityConfig {
                 "http://localhost:5173", // Vite default port
                 "http://localhost:3001", // Alternative Next.js port
                 "http://127.0.0.1:3000",
-                "http://127.0.0.1:5173"));
+                "http://127.0.0.1:5173",
+                "https://techno-frontend-ebon.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
