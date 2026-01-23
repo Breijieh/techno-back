@@ -1,0 +1,70 @@
+﻿mvn : WARNING: A terminally deprecated method in 
+sun.misc.Unsafe has been called
+At line:1 char:1
++ mvn compile -DskipTests 2>&1 | Out-File 
+-FilePath "latest-errors.txt" ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WAR 
+   NING: A term...has been called:String) [], R  
+  emoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: sun.misc.Unsafe::staticFieldBase has 
+been called by com.google.inject.internal.aop.Hid
+denClassDefiner (file:/C:/apache-maven-3.9.11/lib
+/guice-5.1.0-classes.jar)
+WARNING: Please consider reporting this to the 
+maintainers of class 
+com.google.inject.internal.aop.HiddenClassDefiner
+WARNING: sun.misc.Unsafe::staticFieldBase will 
+be removed in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.techno:backend >-------------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- jacoco:0.8.13:prepare-agent (default) @ backend ---
+[INFO] argLine set to -javaagent:C:\\Users\\Brj\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.13\\org.jacoco.agent-0.8.13-runtime.jar=destfile=C:\\Projects\\Techno-Fullstack\\techno-backend\\target\\jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 9 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 350 source files with javac [debug parameters release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[18,33] '{' expected
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[20,26] implicitly declared classes are not supported in -source 17
+  (use -source 25 or higher to enable implicitly declared classes)
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[20,91] class, interface, enum, or record expected
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[26,12] invalid method declaration; return type required
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[56,1] class, interface, enum, or record expected
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[1,1] compact source file should not have package declaration
+[INFO] 6 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.446 s
+[INFO] Finished at: 2026-01-14T22:28:28+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project backend: Compilation failure: Compilation failure: 
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[18,33] '{' expected
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[20,26] implicitly declared classes are not supported in -source 17
+[ERROR]   (use -source 25 or higher to enable implicitly declared classes)
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[20,91] class, interface, enum, or record expected
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[26,12] invalid method declaration; return type required
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[56,1] class, interface, enum, or record expected
+[ERROR] /C:/Projects/Techno-Fullstack/techno-backend/src/main/java/com/techno/backend/config/DatabaseInitializer.java:[1,1] compact source file should not have package declaration
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

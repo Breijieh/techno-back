@@ -1,0 +1,6 @@
+﻿
+CommandType     Name        
+-----------     ----        
+Application     java.exe    
+
+

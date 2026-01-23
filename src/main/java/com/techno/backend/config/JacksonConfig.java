@@ -1,0 +1,35 @@
+package com.techno.backend.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import java.nio.charset.StandardCharsets;
+
+/**
+ * Jackson Configuration
+ * Provides ObjectMapper bean for JSON serialization/deserialization
+ * Ensures UTF-8 encoding for all JSON responses
+ */
+@Configuration
+public class JacksonConfig {
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
+                .modules(new JavaTimeModule())
+                .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .build();
+        // Ensure UTF-8 encoding
+        mapper.getFactory().setCharacterEscapes(null);
+        return mapper;
+    }
+}
+
+
+

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: techno-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: techno_erp
+      POSTGRES_USER: techno_admin
+      POSTGRES_PASSWORD: techno_2025
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U techno_admin -d techno_erp" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - techno-network
+
+  backend:
+    build: .
+    container_name: techno-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/techno_erp
+      SPRING_DATASOURCE_USERNAME: techno_admin
+      SPRING_DATASOURCE_PASSWORD: techno_2025
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - techno-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: techno-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@techno.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - techno-network
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  techno-network:
+    driver: bridge

@@ -1,0 +1,11 @@
+﻿
+
+    Directory: C:\Program 
+    Files\Eclipse Adoptium
+
+
+Mode           LastWriteTime
+----           -------------
+d-----   12/5/2025   5:49 PM
+
+
