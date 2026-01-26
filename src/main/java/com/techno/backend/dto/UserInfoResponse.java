@@ -27,5 +27,5 @@ public class UserInfoResponse {
     private Character isActive;
     private LocalDate lastLoginDate;
     private LocalTime lastLoginTime;
+    private String empContractType;
 }
-

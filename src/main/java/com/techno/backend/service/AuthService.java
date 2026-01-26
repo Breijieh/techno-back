@@ -32,7 +32,9 @@ public class AuthService {
     private final UserService userService;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+
     private final JwtConfig jwtConfig;
+    private final com.techno.backend.repository.EmployeeRepository employeeRepository;
 
     /**
      * Authenticate user and return JWT tokens
@@ -53,14 +55,14 @@ public class AuthService {
             }
 
             // Authenticate using Spring Security
-            // Use the actual username from the found user account, not the identifier passed in
-            // This is important because UserDetailsService returns UserDetails with the username field
+            // Use the actual username from the found user account, not the identifier
+            // passed in
+            // This is important because UserDetailsService returns UserDetails with the
+            // username field
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            user.getUsername(),  // Use actual username, not the identifier
-                            request.getPassword()
-                    )
-            );
+                            user.getUsername(), // Use actual username, not the identifier
+                            request.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -185,20 +187,21 @@ public class AuthService {
     @Transactional(readOnly = true)
     public UserInfoResponse getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.debug("getCurrentUser - Authentication: {}, Authenticated: {}", 
+        log.debug("getCurrentUser - Authentication: {}, Authenticated: {}",
                 authentication != null ? authentication.getName() : "null",
                 authentication != null ? authentication.isAuthenticated() : false);
 
-        if (authentication == null || !authentication.isAuthenticated() || 
-            "anonymousUser".equals(authentication.getName())) {
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getName())) {
             log.error("User not authenticated or anonymous user detected");
             throw new UnauthorizedException("المستخدم غير مصادق عليه");
         }
 
         UserAccount user;
         Object principal = authentication.getPrincipal();
-        
-        // The JWT filter sets the principal to employee number if available, otherwise username
+
+        // The JWT filter sets the principal to employee number if available, otherwise
+        // username
         if (principal instanceof Long) {
             // Principal is employee number
             Long employeeNo = (Long) principal;
@@ -214,7 +217,7 @@ public class AuthService {
             throw new UnauthorizedException("رئيس المصادقة غير صالح");
         }
 
-        return UserInfoResponse.builder()
+        UserInfoResponse.UserInfoResponseBuilder builder = UserInfoResponse.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .nationalId(user.getNationalId())
@@ -222,8 +225,18 @@ public class AuthService {
                 .employeeNo(user.getEmployeeNo())
                 .isActive(user.getIsActive())
                 .lastLoginDate(user.getLastLoginDate())
-                .lastLoginTime(user.getLastLoginTime())
-                .build();
+                .lastLoginTime(user.getLastLoginTime());
+
+        // Add contract type if employee exists
+        if (user.getEmployeeNo() != null) {
+            try {
+                employeeRepository.findById(user.getEmployeeNo())
+                        .ifPresent(emp -> builder.empContractType(emp.getEmpContractType()));
+            } catch (Exception e) {
+                log.warn("Could not fetch employee details for user: {}", user.getUsername());
+            }
+        }
+
+        return builder.build();
     }
 }
-
