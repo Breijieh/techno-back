@@ -399,11 +399,27 @@ public class EmployeeService {
 
             // Search text (name or national ID)
             if (searchRequest.getSearchText() != null && !searchRequest.getSearchText().isBlank()) {
-                String searchPattern = "%" + searchRequest.getSearchText().toLowerCase() + "%";
+                String originalSearchText = searchRequest.getSearchText().toLowerCase();
+                String normalizedSearchText = normalizeArabicText(originalSearchText);
+                String likePattern = "%" + normalizedSearchText + "%";
+
+                // Normalize DB columns for comparison
+                jakarta.persistence.criteria.Expression<String> employeeNameExp = root.get("employeeName");
+                jakarta.persistence.criteria.Expression<String> normalizedNameExp = applyArabicNormalization(
+                        employeeNameExp, criteriaBuilder);
+
+                // For National ID, we just check original and normalized text just in case,
+                // though it's usually numeric
+                // But sometimes people search name in the "search text" field which covers both
+                jakarta.persistence.criteria.Expression<String> nationalIdExp = root.get("nationalId");
+
                 Predicate namePredicate = criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("employeeName")), searchPattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("employeeName")), searchPattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("nationalId")), searchPattern));
+                        // Match normalized name against normalized query
+                        criteriaBuilder.like(normalizedNameExp, likePattern),
+                        // Also match original (non-normalized) just in case
+                        criteriaBuilder.like(criteriaBuilder.lower(employeeNameExp), "%" + originalSearchText + "%"),
+                        // Match national ID
+                        criteriaBuilder.like(criteriaBuilder.lower(nationalIdExp), "%" + originalSearchText + "%"));
                 predicates.add(namePredicate);
             }
 
@@ -441,6 +457,59 @@ public class EmployeeService {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    /**
+     * Normalize Arabic text for search.
+     * Unifies Alef forms, Ta Marbuta/Ha, and Ya/Alef Maqsura.
+     */
+    /**
+     * Normalize Arabic text for search.
+     * Unifies Alef forms, Ta Marbuta/Ha, Ya/Alef Maqsura, and removes Tashkeel
+     * (Diacritics).
+     */
+    private String normalizeArabicText(String text) {
+        if (text == null)
+            return null;
+        text = text.replaceAll("[\\u064B-\\u065F]", ""); // Remove all Tashkeel/Diacritics
+        return text
+                .replaceAll("[أإآ]", "ا") // Normalize Alefs
+                .replaceAll("ة", "ه") // Normalize Ta Marbuta to Ha
+                .replaceAll("ى", "ي"); // Normalize Alef Maqsura to Ya
+    }
+
+    /**
+     * Build a CriteriaBuilder expression to normalize Arabic text in the database.
+     * Applies nested REPLACE functions for chars and diacritics.
+     */
+    private jakarta.persistence.criteria.Expression<String> applyArabicNormalization(
+            jakarta.persistence.criteria.Expression<String> expression,
+            jakarta.persistence.criteria.CriteriaBuilder cb) {
+
+        jakarta.persistence.criteria.Expression<String> exp = expression;
+
+        // Strip Diacritics (Tashkeel) - Range 064B to 0652 usually
+        // Common ones: Fathatan, Dammatan, Kasratan, Fatha, Damma, Kasra, Shadda, Sukun
+        char[] diacritics = {
+                '\u064B', '\u064C', '\u064D', '\u064E', '\u064F', '\u0650', '\u0651', '\u0652'
+        };
+
+        for (char d : diacritics) {
+            exp = cb.function("REPLACE", String.class, exp, cb.literal(String.valueOf(d)), cb.literal(""));
+        }
+
+        // Normalize Alefs (أ, إ, آ -> ا)
+        exp = cb.function("REPLACE", String.class, exp, cb.literal("أ"), cb.literal("ا"));
+        exp = cb.function("REPLACE", String.class, exp, cb.literal("إ"), cb.literal("ا"));
+        exp = cb.function("REPLACE", String.class, exp, cb.literal("آ"), cb.literal("ا"));
+
+        // Normalize Ta Marbuta (ة -> ه)
+        exp = cb.function("REPLACE", String.class, exp, cb.literal("ة"), cb.literal("ه"));
+
+        // Normalize Alef Maqsura (ى -> ي)
+        exp = cb.function("REPLACE", String.class, exp, cb.literal("ى"), cb.literal("ي"));
+
+        return exp;
     }
 
     /**

@@ -1,4 +1,5 @@
 package com.techno.backend.service;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +82,17 @@ public class AllowanceService {
         Employee employee = employeeRepository.findById(employeeNo)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Ø§Ù„Ù…ÙˆØ¸Ù ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯ Ø¨Ø±Ù‚Ù…: " + employeeNo));
+
+        // Validate employee is active
+        if (employee.getEmploymentStatus() != null && !"ACTIVE".equals(employee.getEmploymentStatus())) {
+            throw new BadRequestException(
+                    "ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸Ù ÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ† Ù Ù‚Ø· ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¨Ø¯Ù„Ø§Øª");
+        }
+
+        // Validate contract type
+        if (employee.getEmpContractType() != null && !"TECHNO".equals(employee.getEmpContractType())) {
+            throw new BadRequestException("Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¨Ø¯Ù„Ø§Øª Ù…ØªØ§Ø­Ø© Ù Ù‚Ø· Ù„Ù…ÙˆØ¸Ù ÙŠ Ø¹Ù‚ÙˆØ¯ ØªÙƒÙ†Ùˆ");
+        }
 
         // Validate transaction type
         TransactionType transactionType = transactionTypeRepository.findById(typeCode)
@@ -398,7 +410,8 @@ public class AllowanceService {
         try {
             Map<String, Object> variables = new HashMap<>();
             variables.put("employeeName", employee.getEmployeeName());
-            variables.put("allowanceType", transactionType != null ? transactionType.getTypeName() : "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ");
+            variables.put("allowanceType",
+                    transactionType != null ? transactionType.getTypeName() : "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ");
             variables.put("allowanceAmount", allowance.getAllowanceAmount().toString());
             variables.put("transactionDate", allowance.getTransactionDate().toString());
             variables.put("notes", allowance.getEntryReason() != null ? allowance.getEntryReason() : "");
@@ -429,7 +442,8 @@ public class AllowanceService {
         try {
             Map<String, Object> variables = new HashMap<>();
             variables.put("employeeName", employee.getEmployeeName());
-            variables.put("allowanceType", transactionType != null ? transactionType.getTypeName() : "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ");
+            variables.put("allowanceType",
+                    transactionType != null ? transactionType.getTypeName() : "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ");
             variables.put("allowanceAmount", allowance.getAllowanceAmount().toString());
             variables.put("transactionDate", allowance.getTransactionDate().toString());
             variables.put("linkUrl", "/allowances/" + allowance.getTransactionNo());
@@ -460,7 +474,8 @@ public class AllowanceService {
         try {
             Map<String, Object> variables = new HashMap<>();
             variables.put("employeeName", employee.getEmployeeName());
-            variables.put("allowanceType", transactionType != null ? transactionType.getTypeName() : "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ");
+            variables.put("allowanceType",
+                    transactionType != null ? transactionType.getTypeName() : "ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ");
             variables.put("allowanceAmount", allowance.getAllowanceAmount().toString());
             variables.put("transactionDate", allowance.getTransactionDate().toString());
             variables.put("rejectionReason", rejectionReason != null ? rejectionReason : "");
@@ -482,4 +497,3 @@ public class AllowanceService {
         }
     }
 }
-

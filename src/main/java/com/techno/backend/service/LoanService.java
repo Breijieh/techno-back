@@ -101,7 +101,12 @@ public class LoanService {
                 .orElseThrow(() -> new RuntimeException("Ø§Ù„Ù…ÙˆØ¸Ù ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + employeeNo));
 
         if (!"ACTIVE".equals(employee.getEmploymentStatus())) {
-            throw new BadRequestException("ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ† ÙÙ‚Ø· ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙˆØ¶");
+            throw new BadRequestException(
+                    "ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸Ù ÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ† Ù Ù‚Ø· ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙˆØ¶");
+        }
+
+        if (!"TECHNO".equals(employee.getEmpContractType())) {
+            throw new BadRequestException("Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù‚Ø±ÙˆØ¶ Ù…ØªØ§Ø­Ø© Ù Ù‚Ø· Ù„Ù…ÙˆØ¸Ù ÙŠ Ø¹Ù‚ÙˆØ¯ ØªÙƒÙ†Ùˆ");
         }
 
         // Validate no active loans
@@ -132,7 +137,8 @@ public class LoanService {
 
         // Validate first installment date
         if (firstInstallmentDate.isBefore(LocalDate.now().plusMonths(1))) {
-            throw new BadRequestException("ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† ØªØ§Ø±ÙŠØ® Ø§Ù„Ù‚Ø³Ø· Ø§Ù„Ø£ÙˆÙ„ Ø¨Ø¹Ø¯ Ø´Ù‡Ø± ÙˆØ§Ø­Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ Ù…Ù† Ø§Ù„Ø¢Ù†");
+            throw new BadRequestException(
+                    "ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† ØªØ§Ø±ÙŠØ® Ø§Ù„Ù‚Ø³Ø· Ø§Ù„Ø£ÙˆÙ„ Ø¨Ø¹Ø¯ Ø´Ù‡Ø± ÙˆØ§Ø­Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ Ù…Ù† Ø§Ù„Ø¢Ù†");
         }
 
         // Calculate installment amount
@@ -194,7 +200,8 @@ public class LoanService {
 
         // Validate request is pending approval
         if (!"N".equals(loan.getTransStatus())) {
-            throw new RuntimeException("Ø·Ù„Ø¨ Ø§Ù„Ù‚Ø±Ø¶ Ù„ÙŠØ³ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©. Ø§Ù„Ø­Ø§Ù„Ø©: " + loan.getTransStatus());
+            throw new RuntimeException("Ø·Ù„Ø¨ Ø§Ù„Ù‚Ø±Ø¶ Ù„ÙŠØ³ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©. Ø§Ù„Ø­Ø§Ù„Ø©: "
+                    + loan.getTransStatus());
         }
 
         // Validate approver (Allow Admins to bypass check)
@@ -204,7 +211,8 @@ public class LoanService {
 
         if (!isAdmin && !approvalWorkflowService.canApprove(REQUEST_TYPE, loan.getNextAppLevel(),
                 approverNo, loan.getNextApproval())) {
-            throw new RuntimeException("Ø£Ù†Øª ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨ Ø§Ù„Ù‚Ø±Ø¶ Ù‡Ø°Ø§");
+            throw new RuntimeException(
+                    "Ø£Ù†Øª ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨ Ø§Ù„Ù‚Ø±Ø¶ Ù‡Ø°Ø§");
         }
 
         // Move to next level or finalize
@@ -559,7 +567,8 @@ public class LoanService {
 
         // Validate new due date
         if (!newDueDate.isAfter(LocalDate.now())) {
-            throw new RuntimeException("ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ø³ØªØ­Ù‚Ø§Ù‚ Ø§Ù„Ø¬Ø¯ÙŠØ¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† ÙÙŠ Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„");
+            throw new RuntimeException(
+                    "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ø³ØªØ­Ù‚Ø§Ù‚ Ø§Ù„Ø¬Ø¯ÙŠØ¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† ÙÙŠ Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„");
         }
 
         // Check for pending postponement requests for this installment
@@ -629,13 +638,15 @@ public class LoanService {
         // Validate request is pending approval
         if (!"N".equals(request.getTransStatus())) {
             throw new RuntimeException(
-                    "Ø·Ù„Ø¨ Ø§Ù„ØªØ£Ø¬ÙŠÙ„ Ù„ÙŠØ³ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©. Ø§Ù„Ø­Ø§Ù„Ø©: " + request.getTransStatus());
+                    "Ø·Ù„Ø¨ Ø§Ù„ØªØ£Ø¬ÙŠÙ„ Ù„ÙŠØ³ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©. Ø§Ù„Ø­Ø§Ù„Ø©: "
+                            + request.getTransStatus());
         }
 
         // Validate approver
         if (!approvalWorkflowService.canApprove(POSTPONEMENT_REQUEST_TYPE, request.getNextAppLevel(),
                 approverNo, request.getNextApproval())) {
-            throw new RuntimeException("Ø£Ù†Øª ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨ Ø§Ù„ØªØ£Ø¬ÙŠÙ„ Ù‡Ø°Ø§");
+            throw new RuntimeException(
+                    "Ø£Ù†Øª ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨ Ø§Ù„ØªØ£Ø¬ÙŠÙ„ Ù‡Ø°Ø§");
         }
 
         // Get loan and employee for approval workflow
@@ -955,7 +966,8 @@ public class LoanService {
             variables.put("employeeName", employee.getEmployeeName());
             variables.put("loanAmount", loan.getLoanAmount().toString());
             variables.put("noOfInstallments", loan.getNoOfInstallments().toString());
-            variables.put("currentLevel", loan.getNextAppLevel() != null ? loan.getNextAppLevel().toString() : "ØºÙŠØ± Ù…ØªØ§Ø­");
+            variables.put("currentLevel",
+                    loan.getNextAppLevel() != null ? loan.getNextAppLevel().toString() : "ØºÙŠØ± Ù…ØªØ§Ø­");
             variables.put("linkUrl", "/loans/" + loan.getLoanId());
 
             eventPublisher.publishEvent(new NotificationEvent(
@@ -1166,4 +1178,3 @@ public class LoanService {
         }
     }
 }
-

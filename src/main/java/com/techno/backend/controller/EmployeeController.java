@@ -103,16 +103,43 @@ public class EmployeeController {
      * @return Filtered and paginated list of employees
      */
     @PostMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_MANAGER', 'HR_MANAGER', 'FINANCE_MANAGER', 'PROJECT_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GENERAL_MANAGER', 'HR_MANAGER', 'FINANCE_MANAGER', 'PROJECT_MANAGER', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<EmployeeListResponse>> searchEmployees(
             @RequestBody EmployeeSearchRequest searchRequest) {
 
         log.info("POST /api/employees/search - criteria: {}", searchRequest);
 
+        // For EMPLOYEE role, restrict search to their own record
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"))) {
+            Long currentEmployeeNo = getCurrentEmployeeNo();
+            log.info("Employee role detected in search, restricting to employee number: {}", currentEmployeeNo);
+
+            // Functionally equivalent to returning their own record, ignoring other
+            // criteria
+            // or we could force employeeNo in searchRequest, but getting by ID is
+            // safer/simpler
+            EmployeeResponse employeeResponse = employeeService.getEmployeeById(currentEmployeeNo);
+            List<EmployeeResponse> employeeList = List.of(employeeResponse);
+
+            EmployeeListResponse response = EmployeeListResponse.builder()
+                    .employees(employeeList)
+                    .totalElements(1L)
+                    .totalPages(1)
+                    .currentPage(0)
+                    .pageSize(1)
+                    .build();
+
+            return ResponseEntity.ok(ApiResponse.success(
+                    "تم استرجاع الموظف بنجاح",
+                    response));
+        }
+
         EmployeeListResponse response = employeeService.searchEmployees(searchRequest);
 
         return ResponseEntity.ok(ApiResponse.success(
-                "Ø§ÙƒØªÙ…Ù„ Ø§Ù„Ø¨Ø­Ø« Ø¨Ù†Ø¬Ø§Ø­",
+                "اكتمل البحث بنجاح",
                 response));
     }
 
@@ -165,7 +192,8 @@ public class EmployeeController {
                 }
             }
             if (currentEmployeeNo == null || !currentEmployeeNo.equals(id)) {
-                throw new UnauthorizedException("ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ† Ø§Ù„ÙˆØµÙˆÙ„ ÙÙ‚Ø· Ø¥Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§ØªÙ‡Ù… Ø§Ù„Ø®Ø§ØµØ©");
+                throw new UnauthorizedException(
+                        "ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ† Ø§Ù„ÙˆØµÙˆÙ„ ÙÙ‚Ø· Ø¥Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§ØªÙ‡Ù… Ø§Ù„Ø®Ø§ØµØ©");
             }
         }
 
@@ -310,7 +338,8 @@ public class EmployeeController {
 
                 log.warn("Principal is String ({}) and no employee link found. User is not linked to an employee.",
                         principal);
-                throw new ResourceNotFoundException("Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø³Ø¬Ù„ Ù…ÙˆØ¸Ù Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø­Ø§Ù„ÙŠ");
+                throw new ResourceNotFoundException(
+                        "Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø³Ø¬Ù„ Ù…ÙˆØ¸Ù Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø­Ø§Ù„ÙŠ");
             }
         }
         throw new ResourceNotFoundException("Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ØµØ§Ø¯Ù‚Ø©");
@@ -346,7 +375,9 @@ public class EmployeeController {
                 filterEmployeeNo);
 
         return ResponseEntity.ok(ApiResponse.success(
-                String.format("ØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ %d Ù…ÙˆØ¸ÙØ§Ù‹ Ù„Ø¯ÙŠÙ‡Ù… ÙˆØ«Ø§Ø¦Ù‚ Ù…Ù†ØªÙ‡ÙŠØ© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©", response.size()),
+                String.format(
+                        "ØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ %d Ù…ÙˆØ¸ÙØ§Ù‹ Ù„Ø¯ÙŠÙ‡Ù… ÙˆØ«Ø§Ø¦Ù‚ Ù…Ù†ØªÙ‡ÙŠØ© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©",
+                        response.size()),
                 response));
     }
 
@@ -395,8 +426,8 @@ public class EmployeeController {
         documentExpiryAlertService.sendManualDocumentReminder(employee, documentType);
 
         return ResponseEntity.ok(ApiResponse.success(
-                String.format("ØªÙ… Ø¥Ø±Ø³Ø§Ù„ ØªØ°ÙƒÙŠØ± Ù„ÙˆØ«ÙŠÙ‚Ø© %s Ø§Ù„Ù…Ù†ØªÙ‡ÙŠØ© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©", documentType),
+                String.format("ØªÙ… Ø¥Ø±Ø³Ø§Ù„ ØªØ°ÙƒÙŠØ± Ù„ÙˆØ«ÙŠÙ‚Ø© %s Ø§Ù„Ù…Ù†ØªÙ‡ÙŠØ© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©",
+                        documentType),
                 null));
     }
 }
-

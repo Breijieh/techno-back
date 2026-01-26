@@ -87,12 +87,18 @@ public class LeaveService {
                 .orElseThrow(() -> new RuntimeException("Ø§Ù„Ù…ÙˆØ¸Ù ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + employeeNo));
 
         if (!"ACTIVE".equals(employee.getEmploymentStatus())) {
-            throw new RuntimeException("ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸ÙÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ† ÙÙ‚Ø· ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¥Ø¬Ø§Ø²Ø©");
+            throw new RuntimeException(
+                    "ÙŠÙ…ÙƒÙ† Ù„Ù„Ù…ÙˆØ¸Ù ÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ† Ù Ù‚Ø· ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¥Ø¬Ø§Ø²Ø©");
+        }
+
+        if (employee.getEmpContractType() != null && !"TECHNO".equals(employee.getEmpContractType())) {
+            throw new RuntimeException("Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù…ØªØ§Ø­Ø© Ù Ù‚Ø· Ù„Ù…ÙˆØ¸Ù ÙŠ Ø¹Ù‚ÙˆØ¯ ØªÙƒÙ†Ùˆ");
         }
 
         // Validate dates
         if (leaveFromDate.isAfter(leaveToDate)) {
-            throw new RuntimeException("ØªØ§Ø±ÙŠØ® Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø£Ù† ÙŠÙƒÙˆÙ† Ø¨Ø¹Ø¯ ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©");
+            throw new RuntimeException(
+                    "ØªØ§Ø±ÙŠØ® Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø£Ù† ÙŠÙƒÙˆÙ† Ø¨Ø¹Ø¯ ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©");
         }
 
         if (leaveFromDate.isBefore(LocalDate.now())) {
@@ -103,7 +109,8 @@ public class LeaveService {
         BigDecimal leaveDays = calculateLeaveDays(leaveFromDate, leaveToDate);
 
         if (leaveDays.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("ÙØªØ±Ø© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© ÙŠØ¬Ø¨ Ø£Ù† ØªØ´Ù…Ù„ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ ÙŠÙˆÙ… Ø¹Ù…Ù„ ÙˆØ§Ø­Ø¯");
+            throw new RuntimeException(
+                    "ÙØªØ±Ø© Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© ÙŠØ¬Ø¨ Ø£Ù† ØªØ´Ù…Ù„ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ ÙŠÙˆÙ… Ø¹Ù…Ù„ ÙˆØ§Ø­Ø¯");
         }
 
         // Check for overlapping leaves
@@ -181,13 +188,15 @@ public class LeaveService {
 
         // Validate request is pending approval
         if (!"N".equals(leave.getTransStatus())) {
-            throw new RuntimeException("Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù„ÙŠØ³ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©. Ø§Ù„Ø­Ø§Ù„Ø©: " + leave.getTransStatus());
+            throw new RuntimeException("Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù„ÙŠØ³ ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©. Ø§Ù„Ø­Ø§Ù„Ø©: "
+                    + leave.getTransStatus());
         }
 
         // Validate approver
         if (!approvalWorkflowService.canApprove(REQUEST_TYPE, leave.getNextAppLevel(),
                 approverNo, leave.getNextApproval())) {
-            throw new RuntimeException("Ø£Ù†Øª ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù‡Ø°Ø§");
+            throw new RuntimeException(
+                    "Ø£Ù†Øª ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© Ù‡Ø°Ø§");
         }
 
         // Move to next level or finalize
@@ -641,4 +650,3 @@ public class LeaveService {
         }
     }
 }
-

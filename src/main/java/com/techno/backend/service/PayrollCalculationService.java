@@ -315,7 +315,8 @@ public class PayrollCalculationService {
 
         // CRITICAL VALIDATION: Ensure termination date is not before hire date
         if (actualEndDate.isBefore(actualStartDate)) {
-            log.error("Invalid employee data: termination date ({}) is before hire date ({}) for employee {}. Returning 0 salary.",
+            log.error(
+                    "Invalid employee data: termination date ({}) is before hire date ({}) for employee {}. Returning 0 salary.",
                     actualEndDate, actualStartDate, employee.getEmployeeNo());
             return BigDecimal.ZERO;
         }
@@ -559,7 +560,13 @@ public class PayrollCalculationService {
             throw new RuntimeException("Ø§Ù„Ø±Ø§ØªØ¨ Ù…Ø±ÙÙˆØ¶ Ø¨Ø§Ù„ÙØ¹Ù„");
         }
         if (!"N".equals(salary.getTransStatus())) {
-            throw new RuntimeException("Ø­Ø§Ù„Ø© Ø§Ù„Ø±Ø§ØªØ¨ ØºÙŠØ± ØµØ§Ù„Ø­Ø©: " + salary.getTransStatus());
+            throw new RuntimeException("حالة الراتب غير صالحة: " + salary.getTransStatus());
+        }
+
+        // Validate sequential approval: Check if previous months are approved
+        if (salaryHeaderRepository.existsUnapprovedPreviousPayroll(salary.getEmployeeNo(), salary.getSalaryMonth())) {
+            throw new RuntimeException(
+                    "لا يمكن اعتماد هذا الراتب لوجود رواتب سابقة غير معتمدة لهذا الموظف. يجب اعتماد الرواتب السابقة أولاً.");
         }
 
         // Validate approver authorization

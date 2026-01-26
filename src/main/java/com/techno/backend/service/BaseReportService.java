@@ -8,6 +8,7 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.chrono.IsoChronology;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -34,10 +35,14 @@ public abstract class BaseReportService {
 
     /**
      * Date formatters for consistent date rendering across all reports.
+     * MONTH_YEAR_FORMATTER uses Egyptian Arabic locale (ar_EG) to ensure Gregorian
+     * calendar.
      */
     protected static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     protected static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    protected static final DateTimeFormatter MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
+    protected static final DateTimeFormatter MONTH_YEAR_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy")
+            .withLocale(new Locale("ar", "EG")) // Egypt uses Gregorian calendar
+            .withChronology(IsoChronology.INSTANCE); // Force Gregorian/ISO calendar
 
     /**
      * Currency formatter for Saudi Riyal (SAR) with proper thousand separators.
@@ -54,14 +59,14 @@ public abstract class BaseReportService {
     /**
      * Generate report in the format implemented by the concrete service.
      *
-     * @param title Report title
-     * @param headers Column headers
-     * @param data Report data rows
+     * @param title    Report title
+     * @param headers  Column headers
+     * @param data     Report data rows
      * @param metadata Additional report metadata (filters, date range, etc.)
      * @return Byte array of the generated report file
      */
     public abstract byte[] generateReport(String title, List<String> headers,
-                                         List<List<Object>> data, Map<String, Object> metadata);
+            List<List<Object>> data, Map<String, Object> metadata);
 
     /**
      * Get the file extension for this report format.
@@ -73,7 +78,8 @@ public abstract class BaseReportService {
     /**
      * Get the MIME type for this report format.
      *
-     * @return MIME type (e.g., "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+     * @return MIME type (e.g.,
+     *         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
      */
     public abstract String getMimeType();
 
@@ -101,7 +107,8 @@ public abstract class BaseReportService {
      * Format a BigDecimal as currency (SAR).
      *
      * @param amount Amount to format
-     * @return Formatted currency string with thousand separators or empty string if null
+     * @return Formatted currency string with thousand separators or empty string if
+     *         null
      */
     protected String formatCurrency(BigDecimal amount) {
         return amount != null ? CURRENCY_FORMATTER.format(amount) : "";
@@ -165,9 +172,9 @@ public abstract class BaseReportService {
     /**
      * Validate report parameters.
      *
-     * @param title Report title
+     * @param title   Report title
      * @param headers Column headers
-     * @param data Report data
+     * @param data    Report data
      * @throws IllegalArgumentException if validation fails
      */
     protected void validateReportParameters(String title, List<String> headers, List<List<Object>> data) {
@@ -223,7 +230,7 @@ public abstract class BaseReportService {
      * Get metadata value as string.
      *
      * @param metadata Metadata map
-     * @param key Metadata key
+     * @param key      Metadata key
      * @return String value or empty string if not found
      */
     protected String getMetadataString(Map<String, Object> metadata, String key) {

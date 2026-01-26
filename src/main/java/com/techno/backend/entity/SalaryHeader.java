@@ -224,14 +224,30 @@ public class SalaryHeader {
     private LocalDateTime modifiedDate;
 
     // Relationships
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_no", insertable = false, updatable = false)
     private Employee employee;
 
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     @OneToMany(mappedBy = "salaryHeader", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineNo ASC")
     @Builder.Default
     private List<SalaryDetail> salaryDetails = new ArrayList<>();
+
+    @Transient
+    private String blockingReason;
+
+    // Explicit getter for Jackson serialization (Transient fields need this)
+    @com.fasterxml.jackson.annotation.JsonProperty("blockingReason")
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+    public String getBlockingReason() {
+        return this.blockingReason;
+    }
+
+    public void setBlockingReason(String blockingReason) {
+        this.blockingReason = blockingReason;
+    }
 
     // Helper methods
     public boolean isApproved() {
@@ -313,8 +329,9 @@ public class SalaryHeader {
         // Note: Gross Salary breakdown is already included in totalAllowances
         this.netSalary = this.totalAllowances
                 .subtract(this.totalDeductions);
-        
-        // Warning: Negative net salary may indicate data issues or business rule violations
+
+        // Warning: Negative net salary may indicate data issues or business rule
+        // violations
         if (this.netSalary.compareTo(BigDecimal.ZERO) < 0) {
             log.warn("Negative net salary calculated: {} for employee {} (month: {}). " +
                     "This may indicate excessive deductions, loans, or data entry errors. " +
