@@ -10,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,6 +58,8 @@ import java.util.List;
 @ToString(exclude = { "salaryDetails" })
 @EntityListeners(AuditingEntityListener.class)
 public class SalaryHeader {
+
+    private static final Logger log = LoggerFactory.getLogger(SalaryHeader.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -309,5 +313,16 @@ public class SalaryHeader {
         // Note: Gross Salary breakdown is already included in totalAllowances
         this.netSalary = this.totalAllowances
                 .subtract(this.totalDeductions);
+        
+        // Warning: Negative net salary may indicate data issues or business rule violations
+        if (this.netSalary.compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Negative net salary calculated: {} for employee {} (month: {}). " +
+                    "This may indicate excessive deductions, loans, or data entry errors. " +
+                    "Gross: {}, Allowances: {}, Deductions: {}",
+                    this.netSalary, this.employeeNo, this.salaryMonth,
+                    this.grossSalary, this.totalAllowances, this.totalDeductions);
+            // Note: Business rule allows negative net salary for now
+            // Consider adding validation if negative net salary should be prevented
+        }
     }
 }

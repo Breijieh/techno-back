@@ -66,6 +66,9 @@ class PayrollIntegrationTest {
         @Autowired
         private TransactionTypeRepository transactionTypeRepository;
 
+        @Autowired
+        private SalaryBreakdownPercentageRepository salaryBreakdownPercentageRepository;
+
         @MockBean
         private ApprovalWorkflowService approvalWorkflowService;
 
@@ -97,6 +100,7 @@ class PayrollIntegrationTest {
                 departmentRepository.deleteAll();
                 projectRepository.deleteAll();
                 transactionTypeRepository.deleteAll();
+                salaryBreakdownPercentageRepository.deleteAll();
 
                 // Seed Validation Data
                 ContractType ct = ContractType.builder()
@@ -154,6 +158,105 @@ class PayrollIntegrationTest {
                                 .isActive("Y")
                                 .build();
                 transactionTypeRepository.save(loanInstallment);
+
+                // Seed Transportation Type (needed for salary breakdown)
+                TransactionType transportation = TransactionType.builder()
+                                .typeCode(2L)
+                                .typeName("Transportation")
+                                .allowanceDeduction("A")
+                                .isSystemGenerated("Y")
+                                .isActive("Y")
+                                .build();
+                transactionTypeRepository.save(transportation);
+
+                // Seed Housing Type (needed for foreign employee breakdown)
+                TransactionType housing = TransactionType.builder()
+                                .typeCode(3L)
+                                .typeName("Housing")
+                                .allowanceDeduction("A")
+                                .isSystemGenerated("Y")
+                                .isActive("Y")
+                                .build();
+                transactionTypeRepository.save(housing);
+
+                // Seed Communication Type (needed for foreign employee breakdown)
+                TransactionType communication = TransactionType.builder()
+                                .typeCode(4L)
+                                .typeName("Communication")
+                                .allowanceDeduction("A")
+                                .isSystemGenerated("Y")
+                                .isActive("Y")
+                                .build();
+                transactionTypeRepository.save(communication);
+
+                // Seed Other Allowance Type (needed for foreign employee breakdown)
+                TransactionType otherAllowance = TransactionType.builder()
+                                .typeCode(8L)
+                                .typeName("Other Allowance")
+                                .allowanceDeduction("A")
+                                .isSystemGenerated("Y")
+                                .isActive("Y")
+                                .build();
+                transactionTypeRepository.save(otherAllowance);
+
+                // Seed Salary Breakdown Percentages
+                // Saudi employees: 83.4% Basic + 16.6% Transportation
+                SalaryBreakdownPercentage saudiBasic = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("S")
+                                .transTypeCode(1L) // Basic Salary
+                                .salaryPercentage(new BigDecimal("0.8340")) // 83.4%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(saudiBasic);
+
+                SalaryBreakdownPercentage saudiTransport = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("S")
+                                .transTypeCode(2L) // Transportation
+                                .salaryPercentage(new BigDecimal("0.1660")) // 16.6%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(saudiTransport);
+
+                // Foreign employees: 55% Basic + 13.75% Transport + 5.2% Communication + 25% Housing + 1.05% Other
+                SalaryBreakdownPercentage foreignBasic = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("F")
+                                .transTypeCode(1L) // Basic Salary
+                                .salaryPercentage(new BigDecimal("0.5500")) // 55%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(foreignBasic);
+
+                SalaryBreakdownPercentage foreignTransport = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("F")
+                                .transTypeCode(2L) // Transportation
+                                .salaryPercentage(new BigDecimal("0.1375")) // 13.75%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(foreignTransport);
+
+                SalaryBreakdownPercentage foreignCommunication = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("F")
+                                .transTypeCode(4L) // Communication
+                                .salaryPercentage(new BigDecimal("0.0520")) // 5.2%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(foreignCommunication);
+
+                SalaryBreakdownPercentage foreignHousing = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("F")
+                                .transTypeCode(3L) // Housing
+                                .salaryPercentage(new BigDecimal("0.2500")) // 25%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(foreignHousing);
+
+                SalaryBreakdownPercentage foreignOther = SalaryBreakdownPercentage.builder()
+                                .employeeCategory("F")
+                                .transTypeCode(8L) // Other
+                                .salaryPercentage(new BigDecimal("0.0105")) // 1.05%
+                                .isDeleted("N")
+                                .build();
+                salaryBreakdownPercentageRepository.save(foreignOther);
 
                 // Update helper to use these IDs if necessary?
                 // The TestHelper 'createAndSaveEmployee' hardcodes 1L and 100L.

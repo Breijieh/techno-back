@@ -37,6 +37,7 @@ public class EmployeeResponse {
     private LocalDate terminationDate;
     private String employmentStatus;
     private String terminationReason;
+    private String socialInsuranceNo;
     private String empContractType;
     private Long primaryDeptCode;
     private String primaryDeptName;

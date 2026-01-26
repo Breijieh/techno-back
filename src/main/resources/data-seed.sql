@@ -71,23 +71,23 @@ VALUES (9, 'عمل إضافي', 'A', 'Y', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (10, 'زيادة راتب', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (10, 'زيادة راتب', 'A', 'N', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (11, 'مكافأة', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (11, 'مكافأة', 'A', 'N', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (12, 'علاوة سنوية', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (12, 'علاوة سنوية', 'A', 'N', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (13, 'حافز أداء', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (13, 'حافز أداء', 'A', 'N', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (14, 'عمولة', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (14, 'عمولة', 'A', 'N', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
@@ -126,15 +126,15 @@ VALUES (31, 'تأمينات اجتماعية', 'D', 'Y', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (32, 'حسم أخرى', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (32, 'حسم أخرى', 'D', 'Y', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (33, 'جزاءات', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (33, 'جزاءات', 'D', 'Y', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
-VALUES (34, 'حسم أمانة', 'N', 'Y', CURRENT_TIMESTAMP)
+VALUES (34, 'حسم أمانة', 'D', 'Y', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
 -- ====================================================================
@@ -508,12 +508,10 @@ CREATE INDEX IF NOT EXISTS idx_email_template_category ON email_templates(templa
 -- ====================================================================
 
 -- LEAVE_SUBMITTED: Notify approver when leave is submitted
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LEAVE_SUBMITTED',
     'LEAVE',
-    'New Leave Request from {{employeeName}}',
-    '<h2>New Leave Request</h2><p>Dear Manager,</p><p><strong>{{employeeName}}</strong> has submitted a new leave request:</p><ul><li><strong>From:</strong> {{leaveFromDate}}</li><li><strong>To:</strong> {{leaveToDate}}</li><li><strong>Days:</strong> {{leaveDays}}</li><li><strong>Reason:</strong> {{leaveReason}}</li></ul><p>Please review and approve or reject this request.</p><p><a href="{{linkUrl}}">View Leave Request</a></p>',
     'طلب إجازة جديد من {{employeeName}}',
     '<h2 dir="rtl">طلب إجازة جديد</h2><p dir="rtl">عزيزي المدير،</p><p dir="rtl">قدم <strong>{{employeeName}}</strong> طلب إجازة جديد:</p><ul dir="rtl"><li><strong>من:</strong> {{leaveFromDate}}</li><li><strong>إلى:</strong> {{leaveToDate}}</li><li><strong>عدد الأيام:</strong> {{leaveDays}}</li><li><strong>السبب:</strong> {{leaveReason}}</li></ul><p dir="rtl">يرجى مراجعة الطلب والموافقة عليه أو رفضه.</p><p dir="rtl"><a href="{{linkUrl}}">عرض طلب الإجازة</a></p>',
     'employeeName,leaveFromDate,leaveToDate,leaveDays,leaveReason,linkUrl',
@@ -522,12 +520,10 @@ VALUES (
 ON CONFLICT (template_code) DO NOTHING;
 
 -- LEAVE_APPROVED_INTERMEDIATE: Notify next approver
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LEAVE_APPROVED_INTERMEDIATE',
     'LEAVE',
-    'Leave Request for {{employeeName}} Needs Your Approval',
-    '<h2>Leave Approval Required</h2><p>Dear Manager,</p><p>A leave request from <strong>{{employeeName}}</strong> has been approved at the previous level and now requires your approval:</p><ul><li><strong>From:</strong> {{leaveFromDate}}</li><li><strong>To:</strong> {{leaveToDate}}</li><li><strong>Days:</strong> {{leaveDays}}</li></ul><p><a href="{{linkUrl}}">View and Approve</a></p>',
     'طلب إجازة {{employeeName}} يحتاج موافقتك',
     '<h2 dir="rtl">مطلوب الموافقة على الإجازة</h2><p dir="rtl">عزيزي المدير،</p><p dir="rtl">تمت الموافقة على طلب إجازة من <strong>{{employeeName}}</strong> في المستوى السابق ويحتاج الآن إلى موافقتك:</p><ul dir="rtl"><li><strong>من:</strong> {{leaveFromDate}}</li><li><strong>إلى:</strong> {{leaveToDate}}</li><li><strong>عدد الأيام:</strong> {{leaveDays}}</li></ul><p dir="rtl"><a href="{{linkUrl}}">عرض والموافقة</a></p>',
     'employeeName,leaveFromDate,leaveToDate,leaveDays,linkUrl',
@@ -536,12 +532,10 @@ VALUES (
 ON CONFLICT (template_code) DO NOTHING;
 
 -- LEAVE_APPROVED_FINAL: Notify employee of approval
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LEAVE_APPROVED_FINAL',
     'LEAVE',
-    'Your Leave Request Has Been Approved',
-    '<h2>Leave Request Approved</h2><p>Dear {{employeeName}},</p><p>Your leave request has been <strong>approved</strong>!</p><ul><li><strong>From:</strong> {{leaveFromDate}}</li><li><strong>To:</strong> {{leaveToDate}}</li><li><strong>Days:</strong> {{leaveDays}}</li></ul><p>Your leave balance has been updated accordingly.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تمت الموافقة على طلب إجازتك',
     '<h2 dir="rtl">تمت الموافقة على طلب الإجازة</h2><p dir="rtl">عزيزي {{employeeName}}،</p><p dir="rtl">تمت <strong>الموافقة</strong> على طلب إجازتك!</p><ul dir="rtl"><li><strong>من:</strong> {{leaveFromDate}}</li><li><strong>إلى:</strong> {{leaveToDate}}</li><li><strong>عدد الأيام:</strong> {{leaveDays}}</li></ul><p dir="rtl">تم تحديث رصيد إجازتك وفقًا لذلك.</p><p dir="rtl"><a href="{{linkUrl}}">عرض التفاصيل</a></p>',
     'employeeName,leaveFromDate,leaveToDate,leaveDays,linkUrl',
@@ -550,12 +544,10 @@ VALUES (
 ON CONFLICT (template_code) DO NOTHING;
 
 -- LEAVE_REJECTED: Notify employee of rejection
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LEAVE_REJECTED',
     'LEAVE',
-    'Your Leave Request Has Been Rejected',
-    '<h2>Leave Request Rejected</h2><p>Dear {{employeeName}},</p><p>Unfortunately, your leave request has been <strong>rejected</strong>.</p><ul><li><strong>From:</strong> {{leaveFromDate}}</li><li><strong>To:</strong> {{leaveToDate}}</li><li><strong>Days:</strong> {{leaveDays}}</li><li><strong>Rejection Reason:</strong> {{rejectionReason}}</li></ul><p>Please contact your manager for more details.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب إجازتك',
     '<h2 dir="rtl">تم رفض طلب الإجازة</h2><p dir="rtl">عزيزي {{employeeName}}،</p><p dir="rtl">للأسف، تم <strong>رفض</strong> طلب إجازتك.</p><ul dir="rtl"><li><strong>من:</strong> {{leaveFromDate}}</li><li><strong>إلى:</strong> {{leaveToDate}}</li><li><strong>عدد الأيام:</strong> {{leaveDays}}</li><li><strong>سبب الرفض:</strong> {{rejectionReason}}</li></ul><p dir="rtl">يرجى الاتصال بمديرك لمزيد من التفاصيل.</p><p dir="rtl"><a href="{{linkUrl}}">عرض التفاصيل</a></p>',
     'employeeName,leaveFromDate,leaveToDate,leaveDays,rejectionReason,linkUrl',
@@ -564,12 +556,10 @@ VALUES (
 ON CONFLICT (template_code) DO NOTHING;
 
 -- LEAVE_CANCELLED: Notify approver that employee cancelled
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LEAVE_CANCELLED',
     'LEAVE',
-    'Leave Request Cancelled by {{employeeName}}',
-    '<h2>Leave Request Cancelled</h2><p>Dear Manager,</p><p><strong>{{employeeName}}</strong> has cancelled their leave request:</p><ul><li><strong>From:</strong> {{leaveFromDate}}</li><li><strong>To:</strong> {{leaveToDate}}</li><li><strong>Days:</strong> {{leaveDays}}</li></ul><p>No action is required from you.</p>',
     'تم إلغاء طلب الإجازة من قبل {{employeeName}}',
     '<h2 dir="rtl">تم إلغاء طلب الإجازة</h2><p dir="rtl">عزيزي المدير،</p><p dir="rtl">قام <strong>{{employeeName}}</strong> بإلغاء طلب إجازته:</p><ul dir="rtl"><li><strong>من:</strong> {{leaveFromDate}}</li><li><strong>إلى:</strong> {{leaveToDate}}</li><li><strong>عدد الأيام:</strong> {{leaveDays}}</li></ul><p dir="rtl">لا يلزم اتخاذ أي إجراء من جانبك.</p>',
     'employeeName,leaveFromDate,leaveToDate,leaveDays,linkUrl',
@@ -581,108 +571,90 @@ ON CONFLICT (template_code) DO NOTHING;
 -- LOAN Email Templates (9 templates)
 -- ====================================================================
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_SUBMITTED',
     'LOAN',
-    'New Loan Request from {{employeeName}}',
-    '<h2>New Loan Request</h2><p>Dear Manager,</p><p><strong>{{employeeName}}</strong> has submitted a new loan request:</p><ul><li><strong>Amount:</strong> SAR {{loanAmount}}</li><li><strong>Installments:</strong> {{installments}}</li><li><strong>Reason:</strong> {{loanReason}}</li></ul><p>Please review and approve or reject this request.</p><p><a href="{{linkUrl}}">View Loan Request</a></p>',
     'طلب قرض جديد من {{employeeName}}',
     '<h2 dir="rtl">طلب قرض جديد</h2><p dir="rtl">عزيزي المدير، قدم <strong>{{employeeName}}</strong> طلب قرض جديد بمبلغ {{loanAmount}} ريال على {{installments}} قسط. يرجى المراجعة.</p><p dir="rtl"><a href="{{linkUrl}}">عرض الطلب</a></p>',
     'employeeName,loanAmount,installments,loanReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_APPROVED_INTERMEDIATE',
     'LOAN',
-    'Loan Request for {{employeeName}} Needs Your Approval',
-    '<h2>Loan Approval Required</h2><p>Dear Manager,</p><p>A loan request from <strong>{{employeeName}}</strong> has been approved at the previous level:</p><ul><li><strong>Amount:</strong> SAR {{loanAmount}}</li><li><strong>Installments:</strong> {{installments}}</li></ul><p><a href="{{linkUrl}}">Review and Approve</a></p>',
     'طلب قرض {{employeeName}} يحتاج موافقتك',
     '<h2 dir="rtl">مطلوب الموافقة على القرض</h2><p dir="rtl">قرض بمبلغ {{loanAmount}} ريال يحتاج موافقتك.</p><p dir="rtl"><a href="{{linkUrl}}">عرض والموافقة</a></p>',
     'employeeName,loanAmount,installments,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_APPROVED_FINAL',
     'LOAN',
-    'Your Loan Request Has Been Approved',
-    '<h2>Loan Approved</h2><p>Dear {{employeeName}},</p><p>Your loan request has been <strong>approved</strong>!</p><ul><li><strong>Amount:</strong> SAR {{loanAmount}}</li><li><strong>Monthly Installment:</strong> SAR {{monthlyInstallment}}</li><li><strong>Number of Installments:</strong> {{installments}}</li><li><strong>First Deduction Date:</strong> {{firstDeductionDate}}</li></ul><p>Installments will be deducted from your monthly salary.</p><p><a href="{{linkUrl}}">View Loan Details</a></p>',
     'تمت الموافقة على طلب القرض',
     '<h2 dir="rtl">تمت الموافقة على القرض</h2><p dir="rtl">عزيزي {{employeeName}}، تمت الموافقة على قرضك بمبلغ {{loanAmount}} ريال. القسط الشهري {{monthlyInstallment}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,loanAmount,monthlyInstallment,installments,firstDeductionDate,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_REJECTED',
     'LOAN',
-    'Your Loan Request Has Been Rejected',
-    '<h2>Loan Request Rejected</h2><p>Dear {{employeeName}},</p><p>Unfortunately, your loan request has been <strong>rejected</strong>.</p><ul><li><strong>Amount:</strong> SAR {{loanAmount}}</li><li><strong>Rejection Reason:</strong> {{rejectionReason}}</li></ul><p>Please contact HR or Finance for more details.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب القرض',
     '<h2 dir="rtl">تم رفض طلب القرض</h2><p dir="rtl">للأسف تم رفض طلب القرض. السبب: {{rejectionReason}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,loanAmount,rejectionReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_POSTPONEMENT_SUBMITTED',
     'LOAN',
-    'Loan Postponement Request from {{employeeName}}',
-    '<h2>Loan Postponement Request</h2><p>Dear Manager,</p><p><strong>{{employeeName}}</strong> has requested to postpone their loan installment:</p><ul><li><strong>Loan Amount:</strong> SAR {{loanAmount}}</li><li><strong>Remaining Balance:</strong> SAR {{remainingBalance}}</li><li><strong>Postponement Reason:</strong> {{postponementReason}}</li></ul><p><a href="{{linkUrl}}">Review Request</a></p>',
     'طلب تأجيل قسط القرض من {{employeeName}}',
     '<h2 dir="rtl">طلب تأجيل قسط</h2><p dir="rtl">طلب تأجيل من {{employeeName}} للمبلغ المتبقي {{remainingBalance}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">المراجعة</a></p>',
     'employeeName,loanAmount,remainingBalance,postponementReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_POSTPONEMENT_APPROVED',
     'LOAN',
-    'Your Loan Postponement Has Been Approved',
-    '<h2>Postponement Approved</h2><p>Dear {{employeeName}},</p><p>Your loan postponement request has been approved. Your next installment will be deferred to {{nextDueDate}}.</p><p><a href="{{linkUrl}}">View Loan Schedule</a></p>',
     'تمت الموافقة على تأجيل القسط',
     '<h2 dir="rtl">تمت الموافقة على التأجيل</h2><p dir="rtl">تم تأجيل القسط القادم إلى {{nextDueDate}}.</p><p dir="rtl"><a href="{{linkUrl}}">الجدول</a></p>',
     'employeeName,nextDueDate,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_POSTPONEMENT_REJECTED',
     'LOAN',
-    'Your Loan Postponement Request Has Been Rejected',
-    '<h2>Postponement Rejected</h2><p>Dear {{employeeName}},</p><p>Your loan postponement request has been rejected. Reason: {{rejectionReason}}</p><p>Your installment schedule remains unchanged.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب تأجيل القسط',
     '<h2 dir="rtl">تم رفض التأجيل</h2><p dir="rtl">السبب: {{rejectionReason}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,rejectionReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_FULLY_PAID',
     'LOAN',
-    'Congratulations! Your Loan is Fully Paid',
-    '<h2>Loan Completed</h2><p>Dear {{employeeName}},</p><p>Congratulations! You have successfully completed all installments for your loan of SAR {{loanAmount}}.</p><p>Your loan account is now closed. Thank you for your timely payments.</p><p><a href="{{linkUrl}}">View Loan History</a></p>',
     'تهانينا! تم سداد القرض بالكامل',
     '<h2 dir="rtl">تم السداد</h2><p dir="rtl">تهانينا {{employeeName}}! تم سداد قرضك بمبلغ {{loanAmount}} ريال بالكامل.</p><p dir="rtl"><a href="{{linkUrl}}">السجل</a></p>',
     'employeeName,loanAmount,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'LOAN_INSTALLMENT_PAID',
     'LOAN',
-    'Loan Installment Deducted - {{month}}',
-    '<h2>Installment Deducted</h2><p>Dear {{employeeName}},</p><p>Your loan installment for {{month}} has been deducted:</p><ul><li><strong>Installment Amount:</strong> SAR {{installmentAmount}}</li><li><strong>Remaining Balance:</strong> SAR {{remainingBalance}}</li><li><strong>Remaining Installments:</strong> {{remainingInstallments}}</li></ul><p><a href="{{linkUrl}}">View Loan Details</a></p>',
     'تم خصم قسط القرض - {{month}}',
     '<h2 dir="rtl">تم الخصم</h2><p dir="rtl">تم خصم {{installmentAmount}} ريال. المتبقي {{remainingBalance}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,month,installmentAmount,remainingBalance,remainingInstallments,linkUrl',
@@ -693,72 +665,60 @@ VALUES (
 -- PAYROLL Email Templates (6 templates)
 -- ====================================================================
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYROLL_CALCULATED',
     'PAYROLL',
-    'Payroll for {{month}} Has Been Calculated',
-    '<h2>Payroll Ready for Review</h2><p>Dear {{employeeName}},</p><p>The payroll for <strong>{{month}}</strong> has been calculated and is now pending approval.</p><ul><li><strong>Gross Salary:</strong> SAR {{grossSalary}}</li><li><strong>Net Salary:</strong> SAR {{netSalary}}</li></ul><p>Your payslip will be available once approved.</p><p><a href="{{linkUrl}}">View Preliminary Payslip</a></p>',
     'تم احتساب الراتب لشهر {{month}}',
     '<h2 dir="rtl">تم احتساب الراتب</h2><p dir="rtl">الراتب الإجمالي {{grossSalary}} ريال، الصافي {{netSalary}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">عرض</a></p>',
     'employeeName,month,grossSalary,netSalary,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYROLL_APPROVED_L1',
     'PAYROLL',
-    'Payroll {{month}} - HR Approval Complete',
-    '<h2>Payroll Approved - Level 1</h2><p>Payroll for {{month}} has been approved by HR Manager and is now pending Finance Manager approval.</p><p>Total employees: {{employeeCount}}</p><p>Total amount: SAR {{totalAmount}}</p><p><a href="{{linkUrl}}">View Payroll Summary</a></p>',
     'الراتب {{month}} - تمت موافقة الموارد البشرية',
     '<h2 dir="rtl">موافقة المستوى الأول</h2><p dir="rtl">إجمالي {{totalAmount}} ريال لـ {{employeeCount}} موظف.</p><p dir="rtl"><a href="{{linkUrl}}">عرض</a></p>',
     'month,employeeCount,totalAmount,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYROLL_APPROVED_L2',
     'PAYROLL',
-    'Payroll {{month}} - Finance Approval Complete',
-    '<h2>Payroll Approved - Level 2</h2><p>Payroll for {{month}} has been approved by Finance Manager and is now pending General Manager final approval.</p><p>Total amount: SAR {{totalAmount}}</p><p><a href="{{linkUrl}}">Review for Final Approval</a></p>',
     'الراتب {{month}} - تمت موافقة المالية',
     '<h2 dir="rtl">موافقة المستوى الثاني</h2><p dir="rtl">بانتظار الموافقة النهائية.</p><p dir="rtl"><a href="{{linkUrl}}">عرض</a></p>',
     'month,totalAmount,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYROLL_APPROVED_FINAL',
     'PAYROLL',
-    'Your Salary for {{month}} is Ready',
-    '<h2>Payslip Available</h2><p>Dear {{employeeName}},</p><p>Your salary for <strong>{{month}}</strong> has been finalized:</p><ul><li><strong>Gross Salary:</strong> SAR {{grossSalary}}</li><li><strong>Total Allowances:</strong> SAR {{totalAllowances}}</li><li><strong>Total Deductions:</strong> SAR {{totalDeductions}}</li><li><strong>Net Salary:</strong> SAR {{netSalary}}</li></ul><p><a href="{{linkUrl}}">Download Payslip</a></p>',
     'راتبك لشهر {{month}} جاهز',
     '<h2 dir="rtl">كشف الراتب متاح</h2><p dir="rtl">الراتب الصافي {{netSalary}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">تحميل كشف الراتب</a></p>',
     'employeeName,month,grossSalary,totalAllowances,totalDeductions,netSalary,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYROLL_REJECTED',
     'PAYROLL',
-    'Payroll {{month}} Rejected - Recalculation Required',
-    '<h2>Payroll Rejected</h2><p>The payroll for {{month}} has been rejected and requires recalculation.</p><p>Rejection reason: {{rejectionReason}}</p><p>Please review and recalculate.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض الراتب {{month}}',
     '<h2 dir="rtl">تم الرفض</h2><p dir="rtl">السبب: {{rejectionReason}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'month,rejectionReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYROLL_RECALCULATED',
     'PAYROLL',
-    'Your Salary for {{month}} Has Been Updated',
-    '<h2>Salary Recalculated</h2><p>Dear {{employeeName}},</p><p>Your salary for {{month}} has been recalculated:</p><ul><li><strong>Previous Net:</strong> SAR {{previousNet}}</li><li><strong>New Net:</strong> SAR {{newNet}}</li><li><strong>Difference:</strong> SAR {{difference}}</li><li><strong>Reason:</strong> {{recalculationReason}}</li></ul><p><a href="{{linkUrl}}">View Updated Payslip</a></p>',
     'تم تحديث راتبك لشهر {{month}}',
     '<h2 dir="rtl">إعادة احتساب</h2><p dir="rtl">الصافي الجديد {{newNet}} ريال. الفرق {{difference}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">عرض</a></p>',
     'employeeName,month,previousNet,newNet,difference,recalculationReason,linkUrl',
@@ -769,48 +729,40 @@ VALUES (
 -- PAYMENT REQUEST Email Templates (4 templates)
 -- ====================================================================
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYMENT_REQUEST_SUBMITTED',
     'PAYMENT_REQUEST',
-    'New Payment Request - {{projectName}}',
-    '<h2>Payment Request Submitted</h2><p>Dear Manager,</p><p>A new payment request has been submitted for project <strong>{{projectName}}</strong>:</p><ul><li><strong>Amount:</strong> SAR {{paymentAmount}}</li><li><strong>Purpose:</strong> {{paymentPurpose}}</li><li><strong>Requested by:</strong> {{requesterName}}</li></ul><p><a href="{{linkUrl}}">Review and Approve</a></p>',
     'طلب دفع جديد - {{projectName}}',
     '<h2 dir="rtl">طلب دفع</h2><p dir="rtl">مبلغ {{paymentAmount}} ريال للمشروع {{projectName}}.</p><p dir="rtl"><a href="{{linkUrl}}">المراجعة</a></p>',
     'projectName,paymentAmount,paymentPurpose,requesterName,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYMENT_REQUEST_APPROVED_INTERMEDIATE',
     'PAYMENT_REQUEST',
-    'Payment Request Needs Your Approval - {{projectName}}',
-    '<h2>Payment Approval Required</h2><p>A payment request for project {{projectName}} has been approved at the previous level:</p><ul><li><strong>Amount:</strong> SAR {{paymentAmount}}</li><li><strong>Purpose:</strong> {{paymentPurpose}}</li></ul><p><a href="{{linkUrl}}">Review and Approve</a></p>',
     'طلب دفع يحتاج موافقتك - {{projectName}}',
     '<h2 dir="rtl">مطلوب موافقة</h2><p dir="rtl">مبلغ {{paymentAmount}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">الموافقة</a></p>',
     'projectName,paymentAmount,paymentPurpose,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYMENT_REQUEST_APPROVED_FINAL',
     'PAYMENT_REQUEST',
-    'Payment Request Approved - {{projectName}}',
-    '<h2>Payment Approved</h2><p>The payment request for project <strong>{{projectName}}</strong> has been fully approved:</p><ul><li><strong>Amount:</strong> SAR {{paymentAmount}}</li><li><strong>Purpose:</strong> {{paymentPurpose}}</li></ul><p>The payment can now be processed.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تمت الموافقة على طلب الدفع - {{projectName}}',
     '<h2 dir="rtl">تمت الموافقة</h2><p dir="rtl">يمكن معالجة الدفع بمبلغ {{paymentAmount}} ريال.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'projectName,paymentAmount,paymentPurpose,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYMENT_REQUEST_REJECTED',
     'PAYMENT_REQUEST',
-    'Payment Request Rejected - {{projectName}}',
-    '<h2>Payment Request Rejected</h2><p>The payment request for project {{projectName}} has been rejected:</p><ul><li><strong>Amount:</strong> SAR {{paymentAmount}}</li><li><strong>Rejection Reason:</strong> {{rejectionReason}}</li></ul><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب الدفع - {{projectName}}',
     '<h2 dir="rtl">تم الرفض</h2><p dir="rtl">السبب: {{rejectionReason}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'projectName,paymentAmount,rejectionReason,linkUrl',
@@ -821,48 +773,40 @@ VALUES (
 -- TRANSFER Email Templates (4 templates)
 -- ====================================================================
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'TRANSFER_SUBMITTED',
     'TRANSFER',
-    'Transfer Request - {{employeeName}}',
-    '<h2>Employee Transfer Request</h2><p>Dear Manager,</p><p>A transfer request has been submitted for <strong>{{employeeName}}</strong>:</p><ul><li><strong>From:</strong> {{fromProject}}</li><li><strong>To:</strong> {{toProject}}</li><li><strong>Transfer Date:</strong> {{transferDate}}</li><li><strong>Reason:</strong> {{transferReason}}</li></ul><p><a href="{{linkUrl}}">Review Request</a></p>',
     'طلب نقل - {{employeeName}}',
     '<h2 dir="rtl">طلب نقل موظف</h2><p dir="rtl">من {{fromProject}} إلى {{toProject}} بتاريخ {{transferDate}}.</p><p dir="rtl"><a href="{{linkUrl}}">المراجعة</a></p>',
     'employeeName,fromProject,toProject,transferDate,transferReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'TRANSFER_APPROVED_INTERMEDIATE',
     'TRANSFER',
-    'Transfer Request Needs Your Approval - {{employeeName}}',
-    '<h2>Transfer Approval Required</h2><p>A transfer request for {{employeeName}} has been approved at the previous level:</p><ul><li><strong>From:</strong> {{fromProject}}</li><li><strong>To:</strong> {{toProject}}</li></ul><p><a href="{{linkUrl}}">Review and Approve</a></p>',
     'طلب نقل يحتاج موافقتك - {{employeeName}}',
     '<h2 dir="rtl">مطلوب موافقة</h2><p dir="rtl">نقل من {{fromProject}} إلى {{toProject}}.</p><p dir="rtl"><a href="{{linkUrl}}">الموافقة</a></p>',
     'employeeName,fromProject,toProject,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'TRANSFER_APPROVED_FINAL',
     'TRANSFER',
-    'Your Transfer Request Has Been Approved',
-    '<h2>Transfer Approved</h2><p>Dear {{employeeName}},</p><p>Your transfer request has been approved:</p><ul><li><strong>From:</strong> {{fromProject}}</li><li><strong>To:</strong> {{toProject}}</li><li><strong>Effective Date:</strong> {{transferDate}}</li></ul><p>Please coordinate with both project managers for the handover.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تمت الموافقة على طلب النقل',
     '<h2 dir="rtl">تمت الموافقة</h2><p dir="rtl">سيتم نقلك من {{fromProject}} إلى {{toProject}} بتاريخ {{transferDate}}.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,fromProject,toProject,transferDate,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'TRANSFER_REJECTED',
     'TRANSFER',
-    'Your Transfer Request Has Been Rejected',
-    '<h2>Transfer Request Rejected</h2><p>Dear {{employeeName}},</p><p>Your transfer request has been rejected:</p><ul><li><strong>Rejection Reason:</strong> {{rejectionReason}}</li></ul><p>You will remain assigned to {{fromProject}}.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب النقل',
     '<h2 dir="rtl">تم الرفض</h2><p dir="rtl">السبب: {{rejectionReason}}. ستبقى في {{fromProject}}.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,fromProject,rejectionReason,linkUrl',
@@ -873,72 +817,60 @@ VALUES (
 -- ALLOWANCE & DEDUCTION Email Templates (6 templates)
 -- ====================================================================
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'ALLOWANCE_SUBMITTED',
     'ALLOWANCE',
-    'New Allowance Request - {{employeeName}}',
-    '<h2>Allowance Request</h2><p>A new allowance has been submitted for <strong>{{employeeName}}</strong>:</p><ul><li><strong>Type:</strong> {{allowanceType}}</li><li><strong>Amount:</strong> SAR {{amount}}</li><li><strong>Month:</strong> {{month}}</li><li><strong>Reason:</strong> {{reason}}</li></ul><p><a href="{{linkUrl}}">Review and Approve</a></p>',
     'طلب بدل جديد - {{employeeName}}',
     '<h2 dir="rtl">طلب بدل</h2><p dir="rtl">نوع {{allowanceType}} بمبلغ {{amount}} ريال لشهر {{month}}.</p><p dir="rtl"><a href="{{linkUrl}}">المراجعة</a></p>',
     'employeeName,allowanceType,amount,month,reason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'ALLOWANCE_APPROVED',
     'ALLOWANCE',
-    'Allowance Approved - {{month}}',
-    '<h2>Allowance Approved</h2><p>Dear {{employeeName}},</p><p>Your allowance request has been approved:</p><ul><li><strong>Type:</strong> {{allowanceType}}</li><li><strong>Amount:</strong> SAR {{amount}}</li><li><strong>Month:</strong> {{month}}</li></ul><p>This will be included in your {{month}} payroll.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تمت الموافقة على البدل - {{month}}',
     '<h2 dir="rtl">تمت الموافقة</h2><p dir="rtl">سيتم إضافة {{amount}} ريال إلى راتب {{month}}.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,allowanceType,amount,month,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'ALLOWANCE_REJECTED',
     'ALLOWANCE',
-    'Allowance Request Rejected',
-    '<h2>Allowance Rejected</h2><p>Dear {{employeeName}},</p><p>Your allowance request has been rejected:</p><ul><li><strong>Type:</strong> {{allowanceType}}</li><li><strong>Amount:</strong> SAR {{amount}}</li><li><strong>Rejection Reason:</strong> {{rejectionReason}}</li></ul><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب البدل',
     '<h2 dir="rtl">تم الرفض</h2><p dir="rtl">السبب: {{rejectionReason}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,allowanceType,amount,rejectionReason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'DEDUCTION_SUBMITTED',
     'DEDUCTION',
-    'Deduction Submitted - {{employeeName}}',
-    '<h2>Deduction Request</h2><p>A deduction has been submitted for <strong>{{employeeName}}</strong>:</p><ul><li><strong>Type:</strong> {{deductionType}}</li><li><strong>Amount:</strong> SAR {{amount}}</li><li><strong>Month:</strong> {{month}}</li><li><strong>Reason:</strong> {{reason}}</li></ul><p><a href="{{linkUrl}}">Review and Approve</a></p>',
     'تم تقديم خصم - {{employeeName}}',
     '<h2 dir="rtl">طلب خصم</h2><p dir="rtl">نوع {{deductionType}} بمبلغ {{amount}} ريال لشهر {{month}}.</p><p dir="rtl"><a href="{{linkUrl}}">المراجعة</a></p>',
     'employeeName,deductionType,amount,month,reason,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'DEDUCTION_APPROVED',
     'DEDUCTION',
-    'Deduction Approved - {{month}}',
-    '<h2>Deduction Approved</h2><p>Dear {{employeeName}},</p><p>A deduction has been approved:</p><ul><li><strong>Type:</strong> {{deductionType}}</li><li><strong>Amount:</strong> SAR {{amount}}</li><li><strong>Month:</strong> {{month}}</li></ul><p>This will be deducted from your {{month}} payroll.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تمت الموافقة على الخصم - {{month}}',
     '<h2 dir="rtl">تمت الموافقة</h2><p dir="rtl">سيتم خصم {{amount}} ريال من راتب {{month}}.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,deductionType,amount,month,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'DEDUCTION_REJECTED',
     'DEDUCTION',
-    'Deduction Request Rejected',
-    '<h2>Deduction Rejected</h2><p>The deduction request has been rejected:</p><ul><li><strong>Employee:</strong> {{employeeName}}</li><li><strong>Type:</strong> {{deductionType}}</li><li><strong>Amount:</strong> SAR {{amount}}</li><li><strong>Rejection Reason:</strong> {{rejectionReason}}</li></ul><p><a href="{{linkUrl}}">View Details</a></p>',
     'تم رفض طلب الخصم',
     '<h2 dir="rtl">تم الرفض</h2><p dir="rtl">السبب: {{rejectionReason}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,deductionType,amount,rejectionReason,linkUrl',
@@ -949,24 +881,20 @@ VALUES (
 -- SALARY RAISE & ALERT Email Templates (10 templates)
 -- ====================================================================
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'SALARY_RAISE_PROCESSED',
     'SALARY_RAISE',
-    'Your Salary Increase Has Been Processed',
-    '<h2>Salary Increase</h2><p>Dear {{employeeName}},</p><p>Congratulations! Your salary increase has been processed:</p><ul><li><strong>Previous Salary:</strong> SAR {{previousSalary}}</li><li><strong>New Salary:</strong> SAR {{newSalary}}</li><li><strong>Increase:</strong> SAR {{increase}} ({{percentageIncrease}}%)</li><li><strong>Effective From:</strong> {{effectiveDate}}</li></ul><p>Your new salary will be reflected in your next payroll.</p><p><a href="{{linkUrl}}">View Details</a></p>',
     'تمت معالجة زيادة راتبك',
     '<h2 dir="rtl">زيادة الراتب</h2><p dir="rtl">تهانينا! راتبك الجديد {{newSalary}} ريال (زيادة {{increase}} ريال). ساري من {{effectiveDate}}.</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'employeeName,previousSalary,newSalary,increase,percentageIncrease,effectiveDate,linkUrl',
     'Y'
 ) ON CONFLICT (template_code) DO NOTHING;
 
-INSERT INTO email_templates (template_code, template_category, subject_en, body_en, subject_ar, body_ar, available_variables, is_active)
+INSERT INTO email_templates (template_code, template_category, subject, body, available_variables, is_active)
 VALUES (
     'PAYMENT_DUE_ALERT',
     'ALERT',
-    'Payment Due Alert - {{projectName}}',
-    '<h2>Payment Due Alert</h2><p>Dear Manager,</p><p>A project payment is due:</p><ul><li><strong>Project:</strong> {{projectName}}</li><li><strong>Payment #:</strong> {{paymentSequence}}</li><li><strong>Amount:</strong> SAR {{dueAmount}}</li><li><strong>Due Date:</strong> {{dueDate}}</li><li><strong>Alert Type:</strong> {{alertType}}</li><li><strong>Status:</strong> {{message}}</li></ul><p><a href="{{linkUrl}}">View Payment Details</a></p>',
     'تنبيه دفعة مستحقة - {{projectName}}',
     '<h2 dir="rtl">تنبيه دفعة</h2><p dir="rtl">مشروع {{projectName}}: دفعة {{dueAmount}} ريال مستحقة {{dueDate}}. {{message}}</p><p dir="rtl"><a href="{{linkUrl}}">التفاصيل</a></p>',
     'projectName,projectCode,paymentSequence,dueAmount,dueDate,alertType,message,linkUrl',
@@ -1004,67 +932,67 @@ CREATE INDEX IF NOT EXISTS idx_system_config_active ON system_config(is_active, 
 -- ====================================================================
 
 -- Default Configurations from DOCUMNET.MD
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('DEFAULT_GPS_RADIUS_METERS', '500', 'Default GPS radius for check-in validation (meters)', 'Y', 'Y', '500', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'DEFAULT_GPS_RADIUS_METERS', '500', 'STRING', 'SYSTEM', 'Default GPS radius for check-in validation (meters)', 'Y', 'Y', '500', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('OVERTIME_MULTIPLIER', '1.5', 'Overtime pay multiplier rate', 'Y', 'Y', '1.5', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'OVERTIME_MULTIPLIER', '1.5', 'NUMBER', 'SYSTEM', 'Overtime pay multiplier rate', 'Y', 'Y', '1.5', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('AUTO_CHECKOUT_GRACE_HOURS', '2', 'Hours after shift end for automatic checkout', 'Y', 'Y', '2', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'AUTO_CHECKOUT_GRACE_HOURS', '2', 'NUMBER', 'SYSTEM', 'Hours after shift end for automatic checkout', 'Y', 'Y', '2', CURRENT_TIMESTAMP, 'N')   
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('WORKING_DAYS_PER_MONTH', '30', 'Days used in monthly salary calculations', 'Y', 'Y', '30', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'WORKING_DAYS_PER_MONTH', '30', 'NUMBER', 'SYSTEM', 'Days used in monthly salary calculations', 'Y', 'Y', '30', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('MAX_FILE_SIZE_MB', '10', 'Maximum file upload size in megabytes', 'Y', 'Y', '10', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'MAX_FILE_SIZE_MB', '10', 'NUMBER', 'SYSTEM', 'Maximum file upload size in megabytes', 'Y', 'Y', '10', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
 -- Additional useful configurations
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('LATE_THRESHOLD_MINUTES', '15', 'Minutes late before marking as late', 'Y', 'Y', '15', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'LATE_THRESHOLD_MINUTES', '15', 'NUMBER', 'SYSTEM', 'Minutes late before marking as late', 'Y', 'Y', '15', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('EARLY_DEPARTURE_THRESHOLD_MINUTES', '15', 'Minutes early before marking as early departure', 'Y', 'Y', '15', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'EARLY_DEPARTURE_THRESHOLD_MINUTES', '15', 'NUMBER', 'SYSTEM', 'Minutes early before marking as early departure', 'Y', 'Y', '15', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('REQUIRE_GPS_CHECKIN', 'Y', 'Require GPS validation for check-in', 'Y', 'Y', 'Y', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'REQUIRE_GPS_CHECKIN', 'Y', 'BOOLEAN', 'SYSTEM', 'Require GPS validation for check-in', 'Y', 'Y', 'Y', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('ALLOW_REMOTE_CHECKIN', 'N', 'Allow check-in from non-project locations', 'Y', 'Y', 'N', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'ALLOW_REMOTE_CHECKIN', 'N', 'BOOLEAN', 'SYSTEM', 'Allow check-in from non-project locations', 'Y', 'Y', 'N', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('MIN_WAREHOUSE_STOCK_ALERT', '10', 'Minimum stock quantity before alert', 'Y', 'Y', '10', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'MIN_WAREHOUSE_STOCK_ALERT', '10', 'NUMBER', 'SYSTEM', 'Minimum stock quantity before alert', 'Y', 'Y', '10', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
 -- System admin configs (not editable via UI)
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('SYSTEM_VERSION', '1.0.0', 'Current system version', 'Y', 'N', '1.0.0', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'SYSTEM_VERSION', '1.0.0', 'STRING', 'SYSTEM', 'Current system version', 'Y', 'N', '1.0.0', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('DATABASE_MIGRATION_VERSION', '13', 'Latest database migration version', 'Y', 'N', '13', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'DATABASE_MIGRATION_VERSION', '13', 'STRING', 'SYSTEM', 'Latest database migration version', 'Y', 'N', '13', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
 -- Approval Manager Configurations (migrated from hardcoded values)
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('HR_MANAGER_EMPLOYEE_NO', '2', 'Employee number of HR Manager for approvals', 'Y', 'N', '2', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'HR_MANAGER_EMPLOYEE_NO', '2', 'STRING', 'SYSTEM', 'Employee number of HR Manager for approvals', 'Y', 'N', '2', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('FINANCE_MANAGER_EMPLOYEE_NO', '3', 'Employee number of Finance Manager for approvals', 'Y', 'N', '3', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'FINANCE_MANAGER_EMPLOYEE_NO', '3', 'STRING', 'SYSTEM', 'Employee number of Finance Manager for approvals', 'Y', 'N', '3', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
-INSERT INTO system_config (config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
-VALUES ('GENERAL_MANAGER_EMPLOYEE_NO', '1', 'Employee number of General Manager for approvals', 'Y', 'N', '1', CURRENT_TIMESTAMP, 'N')
+INSERT INTO system_config (config_id, config_key, config_value, config_type, config_category, config_description, is_active, is_editable, default_value, created_date, is_deleted)
+VALUES (nextval('system_config_seq'), 'GENERAL_MANAGER_EMPLOYEE_NO', '1', 'STRING', 'SYSTEM', 'Employee number of General Manager for approvals', 'Y', 'N', '1', CURRENT_TIMESTAMP, 'N')
 ON CONFLICT (config_key) DO NOTHING;
 
 -- ====================================================================

@@ -205,7 +205,12 @@ class LoanServiceTest {
                 @Test
                 @DisplayName("Submit Postponement")
                 void testSubmitPostponement() {
-                        Loan loan = Loan.builder().loanId(1L).employeeNo(EMPLOYEE_NO).isActive("Y").build();
+                        Loan loan = Loan.builder()
+                                        .loanId(1L)
+                                        .employeeNo(EMPLOYEE_NO)
+                                        .loanAmount(new BigDecimal("10000.0000"))
+                                        .isActive("Y")
+                                        .build();
                         LoanInstallment inst = LoanInstallment.builder()
                                         .installmentId(10L)
                                         .loanId(1L)
@@ -216,7 +221,10 @@ class LoanServiceTest {
                         when(installmentRepository.findById(10L)).thenReturn(Optional.of(inst));
                         when(employeeRepository.findById(EMPLOYEE_NO)).thenReturn(Optional.of(testEmployee));
                         when(approvalWorkflowService.initializeApproval(any(), any(), any(), any()))
-                                        .thenReturn(ApprovalWorkflowService.ApprovalInfo.builder().transStatus("N")
+                                        .thenReturn(ApprovalWorkflowService.ApprovalInfo.builder()
+                                                        .transStatus("N")
+                                                        .nextApproval(1001L)
+                                                        .nextAppLevel(1)
                                                         .build());
                         when(postponementRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
@@ -230,14 +238,25 @@ class LoanServiceTest {
                 @Test
                 @DisplayName("Approve Postponement")
                 void testApprovePostponement() {
+                        LocalDate currentDueDate = LocalDate.of(2026, 4, 1);
+                        LocalDate newDueDate = LocalDate.of(2026, 5, 1);
                         LoanPostponementRequest req = LoanPostponementRequest.builder()
-                                        .requestId(100L).loanId(1L).installmentId(10L)
-                                        .newDueDate(LocalDate.of(2026, 5, 1)).transStatus("N").build();
-                        Loan loan = Loan.builder().loanId(1L).employeeNo(EMPLOYEE_NO).build();
+                                        .requestId(100L)
+                                        .loanId(1L)
+                                        .installmentId(10L)
+                                        .currentDueDate(currentDueDate)
+                                        .newDueDate(newDueDate)
+                                        .transStatus("N")
+                                        .build();
+                        Loan loan = Loan.builder()
+                                        .loanId(1L)
+                                        .employeeNo(EMPLOYEE_NO)
+                                        .loanAmount(new BigDecimal("10000.0000"))
+                                        .build();
                         LoanInstallment inst = LoanInstallment.builder()
                                         .installmentId(10L)
                                         .loanId(1L)
-                                        .dueDate(LocalDate.of(2026, 4, 1))
+                                        .dueDate(currentDueDate)
                                         .build();
 
                         when(postponementRepository.findById(100L)).thenReturn(Optional.of(req));
@@ -245,14 +264,17 @@ class LoanServiceTest {
                         when(employeeRepository.findById(EMPLOYEE_NO)).thenReturn(Optional.of(testEmployee));
                         when(approvalWorkflowService.canApprove(any(), any(), any(), any())).thenReturn(true);
                         when(approvalWorkflowService.moveToNextLevel(any(), any(), any(), any(), any()))
-                                        .thenReturn(ApprovalWorkflowService.ApprovalInfo.builder().transStatus("A")
+                                        .thenReturn(ApprovalWorkflowService.ApprovalInfo.builder()
+                                                        .transStatus("A")
+                                                        .nextApproval(1003L)
+                                                        .nextAppLevel(3)
                                                         .build());
                         when(installmentRepository.findById(10L)).thenReturn(Optional.of(inst));
                         when(postponementRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
                         loanService.approvePostponement(100L, 1002L);
 
-                        assertThat(inst.getDueDate()).isEqualTo(LocalDate.of(2026, 5, 1));
+                        assertThat(inst.getDueDate()).isEqualTo(newDueDate);
                         assertThat(inst.getPaymentStatus()).isEqualTo("POSTPONED");
                 }
         }

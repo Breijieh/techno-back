@@ -461,6 +461,7 @@ public class EmployeeService {
                 .terminationDate(employee.getTerminationDate())
                 .employmentStatus(employee.getEmploymentStatus())
                 .terminationReason(employee.getTerminationReason())
+                .socialInsuranceNo(employee.getSocialInsuranceNo())
                 .empContractType(employee.getEmpContractType())
                 .primaryDeptCode(employee.getPrimaryDeptCode())
                 .primaryProjectCode(employee.getPrimaryProjectCode())
@@ -503,6 +504,7 @@ public class EmployeeService {
                 .terminationDate(request.getTerminationDate())
                 .employmentStatus(request.getEmploymentStatus() != null ? request.getEmploymentStatus() : "ACTIVE")
                 .terminationReason(request.getTerminationReason())
+                .socialInsuranceNo(request.getSocialInsuranceNo())
                 .empContractType(request.getEmpContractType())
                 .primaryDeptCode(request.getPrimaryDeptCode())
                 .primaryProjectCode(request.getPrimaryProjectCode())
@@ -531,6 +533,7 @@ public class EmployeeService {
         employee.setTerminationDate(request.getTerminationDate());
         employee.setEmploymentStatus(request.getEmploymentStatus());
         employee.setTerminationReason(request.getTerminationReason());
+        employee.setSocialInsuranceNo(request.getSocialInsuranceNo());
         employee.setEmpContractType(request.getEmpContractType());
         employee.setPrimaryDeptCode(request.getPrimaryDeptCode());
         employee.setPrimaryProjectCode(request.getPrimaryProjectCode());

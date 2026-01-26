@@ -39,14 +39,14 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "salary_detail", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"salary_id", "line_no"})
+        @UniqueConstraint(columnNames = { "salary_id", "line_no" })
 })
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false, exclude = {"salaryHeader"})
-@ToString(exclude = {"salaryHeader"})
+@EqualsAndHashCode(callSuper = false, exclude = { "salaryHeader" })
+@ToString(exclude = { "salaryHeader" })
 @EntityListeners(AuditingEntityListener.class)
 public class SalaryDetail {
 
@@ -128,6 +128,7 @@ public class SalaryDetail {
     private LocalDateTime modifiedDate;
 
     // Relationships
+    @com.fasterxml.jackson.annotation.JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "salary_id", insertable = false, updatable = false)
     private SalaryHeader salaryHeader;

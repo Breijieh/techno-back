@@ -100,10 +100,14 @@ public class AttendanceService {
         }
 
         // Validate check-in time is not after scheduled end time
+        log.info("Looking up schedule for check-in - Employee: {}, Department: {}, Project: {}",
+                employeeNo, employee.getPrimaryDeptCode(), request.getProjectCode());
         TimeSchedule schedule = calculationService.findApplicableSchedule(
                 employee.getPrimaryDeptCode(), request.getProjectCode());
         if (schedule == null) {
             // If no schedule found, create default 8-hour schedule (08:00-17:00)
+            log.warn("No schedule found for Employee: {}, Department: {}, Project: {}. Using default schedule (08:00-17:00)",
+                    employeeNo, employee.getPrimaryDeptCode(), request.getProjectCode());
             schedule = TimeSchedule.builder()
                     .scheduleName("الجدول الافتراضي")
                     .scheduledStartTime(LocalTime.of(8, 0))
@@ -112,6 +116,11 @@ public class AttendanceService {
                     .gracePeriodMinutes(15)
                     .isActive("Y")
                     .build();
+        } else {
+            log.info("Schedule found for check-in - Employee: {}, Schedule: {} (ID: {}), Project: {}, Department: {}, Start: {}, End: {}",
+                    employeeNo, schedule.getScheduleName(), schedule.getScheduleId(),
+                    schedule.getProjectCode(), schedule.getDepartmentCode(),
+                    schedule.getScheduledStartTime(), schedule.getScheduledEndTime());
         }
         
         LocalTime currentTime = LocalDateTime.now().toLocalTime();
@@ -137,11 +146,18 @@ public class AttendanceService {
         
         if (isAfterEndTime) {
             String endTimeStr = scheduledEndTime.toString().substring(0, 5); // Format as HH:mm
-            log.warn("Check-in rejected for employee {}: current time {} is after scheduled end time {}",
-                    employeeNo, currentTime, scheduledEndTime);
+            log.warn("Check-in rejected for employee {}: current time {} is after scheduled end time {}. " +
+                    "Schedule used: ID={}, Name={}, Project={}, Department={}, Start={}, End={}",
+                    employeeNo, currentTime, scheduledEndTime,
+                    schedule.getScheduleId(), schedule.getScheduleName(),
+                    schedule.getProjectCode(), schedule.getDepartmentCode(),
+                    schedule.getScheduledStartTime(), schedule.getScheduledEndTime());
             throw new BadRequestException(
-                    String.format("لا يمكن تسجيل الدخول بعد انتهاء وقت العمل المقرر (%s). وقت انتهاء العمل: %s",
-                            endTimeStr, endTimeStr));
+                    String.format("لا يمكن تسجيل الدخول بعد انتهاء وقت العمل المقرر (%s). وقت انتهاء العمل: %s. " +
+                            "الجدول المستخدم: %s (المشروع: %s، القسم: %s)",
+                            endTimeStr, endTimeStr, schedule.getScheduleName(),
+                            schedule.getProjectCode() != null ? schedule.getProjectCode().toString() : "عام",
+                            schedule.getDepartmentCode() != null ? schedule.getDepartmentCode().toString() : "عام"));
         }
 
         // Validate GPS coordinates if required

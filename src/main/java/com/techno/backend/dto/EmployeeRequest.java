@@ -58,6 +58,9 @@ public class EmployeeRequest {
     @Size(max = 500, message = "سبب الإنهاء لا يجب أن يتجاوز 500 حرف")
     private String terminationReason;
 
+    @Size(max = 50, message = "رقم الاشتراك في التامينات لا يجب أن يتجاوز 50 حرفاً")
+    private String socialInsuranceNo;
+
     @NotBlank(message = "نوع العقد مطلوب")
     @Size(max = 20, message = "نوع العقد لا يجب أن يتجاوز 20 حرفاً")
     private String empContractType;

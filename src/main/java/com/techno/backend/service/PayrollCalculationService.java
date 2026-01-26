@@ -313,6 +313,13 @@ public class PayrollCalculationService {
             log.info("Employee terminated on {} (during month), pro-rating salary", actualEndDate);
         }
 
+        // CRITICAL VALIDATION: Ensure termination date is not before hire date
+        if (actualEndDate.isBefore(actualStartDate)) {
+            log.error("Invalid employee data: termination date ({}) is before hire date ({}) for employee {}. Returning 0 salary.",
+                    actualEndDate, actualStartDate, employee.getEmployeeNo());
+            return BigDecimal.ZERO;
+        }
+
         // Check if full month (no pro-rating needed)
         if (actualStartDate.equals(monthStart) && actualEndDate.equals(monthEnd)) {
             log.info("Full month worked, returning full monthly salary: {}", monthlySalary);

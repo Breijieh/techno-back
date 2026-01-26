@@ -134,6 +134,14 @@ public class Employee extends BaseEntity {
     private String terminationReason;
 
     /**
+     * Social Insurance Subscription Number
+     * Optional field, usually for TECHNO contract type
+     */
+    @Size(max = 50, message = "رقم الاشتراك في التامينات لا يجب أن يتجاوز 50 حرفاً")
+    @Column(name = "social_insurance_no", length = 50)
+    private String socialInsuranceNo;
+
+    /**
      * Contract type: TECHNO, CLIENT, CONTRACTOR
      * References CONTRACT_TYPES table
      */
@@ -162,7 +170,7 @@ public class Employee extends BaseEntity {
      */
     @NotNull(message = "الراتب الشهري مطلوب")
     @DecimalMin(value = "0.0", inclusive = false, message = "الراتب يجب أن يكون أكبر من 0")
-    @Digits(integer = 12, fraction = 4, message = "تنسيق الراتب غير صالح")
+    @Digits(integer = 8, fraction = 4, message = "تنسيق الراتب غير صالح")
     @Column(name = "monthly_salary", nullable = false, precision = 12, scale = 4)
     private BigDecimal monthlySalary;
 
@@ -296,10 +304,20 @@ public class Employee extends BaseEntity {
     }
 
     // Auto-generated Lombok methods
-    public Long getPrimaryDeptCode() { return primaryDeptCode; }
-    public Long getPrimaryProjectCode() { return primaryProjectCode; }
+    public Long getPrimaryDeptCode() {
+        return primaryDeptCode;
+    }
+
+    public Long getPrimaryProjectCode() {
+        return primaryProjectCode;
+    }
 
     // Auto-generated Setters
-    public void setPrimaryDeptCode(Long primaryDeptCode) { this.primaryDeptCode = primaryDeptCode; }
-    public void setPrimaryProjectCode(Long primaryProjectCode) { this.primaryProjectCode = primaryProjectCode; }
+    public void setPrimaryDeptCode(Long primaryDeptCode) {
+        this.primaryDeptCode = primaryDeptCode;
+    }
+
+    public void setPrimaryProjectCode(Long primaryProjectCode) {
+        this.primaryProjectCode = primaryProjectCode;
+    }
 }

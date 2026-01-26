@@ -11,6 +11,8 @@ import com.techno.backend.repository.TimeScheduleRepository;
 import com.techno.backend.util.AttendanceCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,6 +149,14 @@ public class TimeScheduleService {
         request.setRequiredHours(calculatedHours);
 
         TimeSchedule schedule = mapToEntity(request);
+        
+        // Set createdBy from current user
+        Long currentEmployeeNo = getCurrentEmployeeNo();
+        if (currentEmployeeNo != null) {
+            schedule.setCreatedBy(currentEmployeeNo);
+            log.debug("Set createdBy to: {} for schedule: {}", currentEmployeeNo, request.getScheduleName());
+        }
+        
         schedule = timeScheduleRepository.save(schedule);
 
         log.info("Time schedule created successfully with ID: {}", schedule.getScheduleId());
@@ -193,6 +203,14 @@ public class TimeScheduleService {
         request.setRequiredHours(calculatedHours);
 
         updateScheduleFromRequest(schedule, request);
+        
+        // Set modifiedBy from current user
+        Long currentEmployeeNo = getCurrentEmployeeNo();
+        if (currentEmployeeNo != null) {
+            schedule.setModifiedBy(currentEmployeeNo);
+            log.debug("Set modifiedBy to: {} for schedule ID: {}", currentEmployeeNo, scheduleId);
+        }
+        
         schedule = timeScheduleRepository.save(schedule);
 
         log.info("Time schedule updated successfully");
@@ -279,6 +297,56 @@ public class TimeScheduleService {
         }
 
         return builder.build();
+    }
+
+    /**
+     * Get current employee number from security context.
+     *
+     * @return Employee number or null if not available
+     */
+    private Long getCurrentEmployeeNo() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.debug("No authentication found in security context");
+                return null;
+            }
+
+            // The JWT filter sets the principal to the employee number (Long) if available
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof Long) {
+                log.debug("Found employee number {} from security context", principal);
+                return (Long) principal;
+            }
+
+            // Fallback: try to parse as Long if it's a String representation
+            if (principal instanceof String) {
+                try {
+                    Long employeeNo = Long.parseLong((String) principal);
+                    log.debug("Parsed employee number {} from string principal", employeeNo);
+                    return employeeNo;
+                } catch (NumberFormatException e) {
+                    log.debug("Could not parse employee number from string principal: {}", principal);
+                }
+            }
+
+            // Also try authentication.getName() as fallback
+            try {
+                Long employeeNo = Long.parseLong(authentication.getName());
+                log.debug("Parsed employee number {} from authentication name", employeeNo);
+                return employeeNo;
+            } catch (NumberFormatException e) {
+                log.debug("Could not parse employee number from authentication name: {}", authentication.getName());
+            }
+
+            log.debug("Could not extract employee number from authentication principal: {}",
+                    principal != null ? principal.getClass().getName() : "null");
+            return null;
+        } catch (Exception e) {
+            log.warn("Error extracting employee number from security context: {}", e.getMessage());
+            return null;
+        }
     }
 }
 

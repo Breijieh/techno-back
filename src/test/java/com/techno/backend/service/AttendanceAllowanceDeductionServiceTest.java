@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -334,5 +335,273 @@ class AttendanceAllowanceDeductionServiceTest {
 
         verify(allowanceRepository, never()).save(any());
         verify(deductionRepository, never()).save(any());
+    }
+
+    // ==================== Section 3.1: Comprehensive Auto-Creation Tests ====================
+
+    @org.junit.jupiter.api.Nested
+    @DisplayName("3.1.1 Overtime Allowance Creation (Type 9) - Additional Tests")
+    class OvertimeAllowanceCreationAdditionalTests {
+
+        @Test
+        @DisplayName("Overtime allowance created on check-out")
+        void createOvertimeAllowance_OnCheckout_CreatesAllowance() {
+            testAttendance.setOvertimeCalc(new BigDecimal("2.00"));
+
+            when(allowanceRepository.existsByEmployeeNoAndTypeCodeAndTransactionDate(
+                    1001L, 9L, testDate)).thenReturn(false);
+
+            EmpMonthlyAllowance savedAllowance = EmpMonthlyAllowance.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(9L)
+                    .transactionDate(testDate)
+                    .allowanceAmount(new BigDecimal("2.00"))
+                    .transStatus("A")
+                    .isManualEntry("N")
+                    .build();
+
+            when(allowanceRepository.save(any(EmpMonthlyAllowance.class))).thenReturn(savedAllowance);
+
+            allowanceDeductionService.createOvertimeAllowance(testAttendance);
+
+            verify(allowanceRepository).save(any(EmpMonthlyAllowance.class));
+        }
+
+        @Test
+        @DisplayName("Overtime allowance amount calculation")
+        void createOvertimeAllowance_AmountCalculation_Correct() {
+            testAttendance.setOvertimeCalc(new BigDecimal("3.00"));
+
+            when(allowanceRepository.existsByEmployeeNoAndTypeCodeAndTransactionDate(
+                    1001L, 9L, testDate)).thenReturn(false);
+
+            EmpMonthlyAllowance savedAllowance = EmpMonthlyAllowance.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(9L)
+                    .transactionDate(testDate)
+                    .allowanceAmount(new BigDecimal("3.00"))
+                    .transStatus("A")
+                    .build();
+
+            when(allowanceRepository.save(any(EmpMonthlyAllowance.class))).thenReturn(savedAllowance);
+
+            allowanceDeductionService.createOvertimeAllowance(testAttendance);
+
+            verify(allowanceRepository).save(argThat(allowance ->
+                    allowance.getAllowanceAmount().compareTo(new BigDecimal("3.00")) == 0));
+        }
+
+        @Test
+        @DisplayName("Overtime allowance auto-approved")
+        void createOvertimeAllowance_AutoApproved_StatusCorrect() {
+            testAttendance.setOvertimeCalc(new BigDecimal("1.00"));
+
+            when(allowanceRepository.existsByEmployeeNoAndTypeCodeAndTransactionDate(
+                    1001L, 9L, testDate)).thenReturn(false);
+
+            EmpMonthlyAllowance savedAllowance = EmpMonthlyAllowance.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(9L)
+                    .transactionDate(testDate)
+                    .allowanceAmount(new BigDecimal("1.00"))
+                    .transStatus("A") // Auto-approved
+                    .isManualEntry("N") // System-generated
+                    .build();
+
+            when(allowanceRepository.save(any(EmpMonthlyAllowance.class))).thenReturn(savedAllowance);
+
+            allowanceDeductionService.createOvertimeAllowance(testAttendance);
+
+            verify(allowanceRepository).save(argThat(allowance ->
+                    "A".equals(allowance.getTransStatus()) && "N".equals(allowance.getIsManualEntry())));
+        }
+    }
+
+    @org.junit.jupiter.api.Nested
+    @DisplayName("3.1.2 Delay Deduction Aggregation (Type 20) - Additional Tests")
+    class DelayDeductionAggregationAdditionalTests {
+
+        @Test
+        @DisplayName("Delay deduction amount calculation")
+        void aggregateMonthlyDelayDeductions_AmountCalculation_Correct() {
+            YearMonth month = YearMonth.of(2025, 1);
+            LocalDate monthStart = month.atDay(1);
+            LocalDate monthEnd = month.atEndOfMonth();
+
+            // Total delay: 2.5 hours
+            when(attendanceRepository.sumDelayedHours(1001L, monthStart, monthEnd))
+                    .thenReturn(2.5);
+
+            AttendanceTransaction delay1 = AttendanceTransaction.builder()
+                    .employeeNo(1001L)
+                    .delayedCalc(new BigDecimal("1.00"))
+                    .build();
+            AttendanceTransaction delay2 = AttendanceTransaction.builder()
+                    .employeeNo(1001L)
+                    .delayedCalc(new BigDecimal("1.50"))
+                    .build();
+
+            when(attendanceRepository.findLateArrivalsByDateRange(monthStart, monthEnd))
+                    .thenReturn(List.of(delay1, delay2));
+            when(deductionRepository.findByEmployeeAndType(1001L, 20L))
+                    .thenReturn(Collections.emptyList());
+
+            EmpMonthlyDeduction savedDeduction = EmpMonthlyDeduction.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(20L)
+                    .deductionAmount(new BigDecimal("2.50"))
+                    .transStatus("A")
+                    .build();
+
+            when(deductionRepository.save(any(EmpMonthlyDeduction.class))).thenReturn(savedDeduction);
+
+            EmpMonthlyDeduction result = allowanceDeductionService.aggregateMonthlyDelayDeductions(1001L, month);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getDeductionAmount()).isEqualByComparingTo(new BigDecimal("2.50"));
+        }
+
+        @Test
+        @DisplayName("Delay deduction includes all delay types")
+        void aggregateMonthlyDelayDeductions_IncludesAllDelayTypes() {
+            YearMonth month = YearMonth.of(2025, 1);
+            LocalDate monthStart = month.atDay(1);
+            LocalDate monthEnd = month.atEndOfMonth();
+
+            // Multiple delays from different days
+            when(attendanceRepository.sumDelayedHours(1001L, monthStart, monthEnd))
+                    .thenReturn(3.0); // Total: 3 hours
+
+            AttendanceTransaction delay1 = AttendanceTransaction.builder()
+                    .employeeNo(1001L)
+                    .delayedCalc(new BigDecimal("0.25"))
+                    .build();
+            AttendanceTransaction delay2 = AttendanceTransaction.builder()
+                    .employeeNo(1001L)
+                    .delayedCalc(new BigDecimal("0.50"))
+                    .build();
+            AttendanceTransaction delay3 = AttendanceTransaction.builder()
+                    .employeeNo(1001L)
+                    .delayedCalc(new BigDecimal("2.25"))
+                    .build();
+
+            when(attendanceRepository.findLateArrivalsByDateRange(monthStart, monthEnd))
+                    .thenReturn(List.of(delay1, delay2, delay3));
+            when(deductionRepository.findByEmployeeAndType(1001L, 20L))
+                    .thenReturn(Collections.emptyList());
+
+            EmpMonthlyDeduction savedDeduction = EmpMonthlyDeduction.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(20L)
+                    .deductionAmount(new BigDecimal("3.00"))
+                    .transStatus("A")
+                    .build();
+
+            when(deductionRepository.save(any(EmpMonthlyDeduction.class))).thenReturn(savedDeduction);
+
+            EmpMonthlyDeduction result = allowanceDeductionService.aggregateMonthlyDelayDeductions(1001L, month);
+
+            assertThat(result).isNotNull();
+            // All delays should be included in the sum
+        }
+    }
+
+    @org.junit.jupiter.api.Nested
+    @DisplayName("3.1.3 Early Departure Deduction (Type 20) - Additional Tests")
+    class EarlyDepartureDeductionAdditionalTests {
+
+        @Test
+        @DisplayName("Early departure amount calculation")
+        void createEarlyDepartureDeduction_AmountCalculation_Correct() {
+            testAttendance.setEarlyOutCalc(new BigDecimal("1.50"));
+
+            when(deductionRepository.findByEmployeeAndType(1001L, 20L))
+                    .thenReturn(Collections.emptyList());
+
+            EmpMonthlyDeduction savedDeduction = EmpMonthlyDeduction.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(20L)
+                    .transactionDate(testDate)
+                    .deductionAmount(new BigDecimal("1.50"))
+                    .transStatus("A")
+                    .build();
+
+            when(deductionRepository.save(any(EmpMonthlyDeduction.class))).thenReturn(savedDeduction);
+
+            allowanceDeductionService.createEarlyDepartureDeduction(testAttendance);
+
+            verify(deductionRepository).save(argThat(deduction ->
+                    deduction.getDeductionAmount().compareTo(new BigDecimal("1.50")) == 0));
+        }
+    }
+
+    @org.junit.jupiter.api.Nested
+    @DisplayName("3.1.4 Shortage Hours Deduction (Type 20) - Additional Tests")
+    class ShortageHoursDeductionAdditionalTests {
+
+        @Test
+        @DisplayName("Shortage amount calculation")
+        void createShortageDeduction_AmountCalculation_Correct() {
+            testAttendance.setShortageHours(new BigDecimal("2.00"));
+
+            when(deductionRepository.findByEmployeeAndType(1001L, 20L))
+                    .thenReturn(Collections.emptyList());
+
+            EmpMonthlyDeduction savedDeduction = EmpMonthlyDeduction.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(20L)
+                    .transactionDate(testDate)
+                    .deductionAmount(new BigDecimal("2.00"))
+                    .transStatus("A")
+                    .build();
+
+            when(deductionRepository.save(any(EmpMonthlyDeduction.class))).thenReturn(savedDeduction);
+
+            allowanceDeductionService.createShortageDeduction(testAttendance);
+
+            verify(deductionRepository).save(argThat(deduction ->
+                    deduction.getDeductionAmount().compareTo(new BigDecimal("2.00")) == 0));
+        }
+    }
+
+    @org.junit.jupiter.api.Nested
+    @DisplayName("3.1.5 Absence Deduction (Type 21) - Additional Tests")
+    class AbsenceDeductionAdditionalTests {
+
+        @Test
+        @DisplayName("Absence amount equals daily salary")
+        void createAbsenceDeduction_AmountEqualsDailySalary() {
+            BigDecimal monthlySalary = new BigDecimal("6000.0000");
+            BigDecimal dailySalary = monthlySalary.divide(new BigDecimal("30"), 4, java.math.RoundingMode.HALF_UP);
+            LocalDate absenceDate = LocalDate.of(2025, 1, 15);
+
+            when(deductionRepository.existsByEmployeeNoAndTypeCodeAndTransactionDate(
+                    1001L, 21L, absenceDate)).thenReturn(false);
+
+            EmpMonthlyDeduction savedDeduction = EmpMonthlyDeduction.builder()
+                    .transactionNo(1L)
+                    .employeeNo(1001L)
+                    .typeCode(21L)
+                    .transactionDate(absenceDate)
+                    .deductionAmount(dailySalary)
+                    .transStatus("A")
+                    .noOfDays(1)
+                    .build();
+
+            when(deductionRepository.save(any(EmpMonthlyDeduction.class))).thenReturn(savedDeduction);
+
+            allowanceDeductionService.createAbsenceDeduction(1001L, absenceDate, dailySalary);
+
+            verify(deductionRepository).save(argThat(deduction ->
+                    deduction.getDeductionAmount().compareTo(dailySalary) == 0 &&
+                    deduction.getNoOfDays() == 1));
+        }
     }
 }

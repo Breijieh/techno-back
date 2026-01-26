@@ -9,8 +9,7 @@ CREATE SEQUENCE IF NOT EXISTS system_config_seq START WITH 1 INCREMENT BY 1;
 -- Contract Types
 CREATE TABLE IF NOT EXISTS contract_types (
     contract_type_code VARCHAR(20) PRIMARY KEY,
-    type_ar_name VARCHAR(100),
-    type_en_name VARCHAR(100),
+    type_name VARCHAR(100),
     calculate_salary VARCHAR(1),
     allow_self_service VARCHAR(1),
     is_active VARCHAR(1),
@@ -20,8 +19,7 @@ CREATE TABLE IF NOT EXISTS contract_types (
 -- Transaction Types
 CREATE TABLE IF NOT EXISTS transactions_types (
     type_code BIGINT PRIMARY KEY,
-    type_ar_name VARCHAR(250),
-    type_en_name VARCHAR(250),
+    type_name VARCHAR(250) NOT NULL,
     allowance_deduction VARCHAR(1),
     is_system_generated VARCHAR(1),
     is_active VARCHAR(1),
@@ -43,8 +41,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uk_salary_breakdown ON salary_breakdown_percen
 CREATE TABLE IF NOT EXISTS weekend_days (
     weekend_id BIGSERIAL PRIMARY KEY,
     day_of_week INTEGER,
-    day_name_ar VARCHAR(50),
-    day_name_en VARCHAR(50),
+    day_name VARCHAR(50) NOT NULL,
     is_active VARCHAR(1),
     created_date TIMESTAMP
 );
@@ -54,8 +51,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uk_weekend_day ON weekend_days (day_of_week);
 CREATE TABLE IF NOT EXISTS eids_holidays (
     holiday_id BIGSERIAL PRIMARY KEY,
     holiday_date DATE,
-    holiday_name_ar VARCHAR(200),
-    holiday_name_en VARCHAR(200),
+    holiday_name VARCHAR(200) NOT NULL,
     holiday_year INTEGER,
     is_recurring VARCHAR(1),
     is_active VARCHAR(1),
@@ -85,10 +81,8 @@ CREATE TABLE IF NOT EXISTS email_templates (
     template_id BIGSERIAL PRIMARY KEY,
     template_code VARCHAR(100),
     template_category VARCHAR(50),
-    subject_en VARCHAR(500),
-    body_en TEXT,
-    subject_ar VARCHAR(500),
-    body_ar TEXT,
+    subject VARCHAR(500) NOT NULL,
+    body TEXT NOT NULL,
     available_variables TEXT,
     is_active VARCHAR(1)
 );

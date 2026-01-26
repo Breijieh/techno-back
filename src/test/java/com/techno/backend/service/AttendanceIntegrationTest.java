@@ -122,7 +122,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(1001L, today)).thenReturn(false);
         when(closureService.isDateClosed(today)).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(true);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(0);
 
@@ -194,7 +202,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(1001L, today)).thenReturn(false);
         when(closureService.isDateClosed(today)).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(false);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(30);
 
@@ -266,7 +282,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(any(Long.class), any(LocalDate.class))).thenReturn(false);
         when(closureService.isDateClosed(any(LocalDate.class))).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(true);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(0);
 
@@ -305,7 +329,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(any(Long.class), any(LocalDate.class))).thenReturn(false);
         when(closureService.isDateClosed(any(LocalDate.class))).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(true);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(0);
 
@@ -342,7 +374,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(1001L, today)).thenReturn(false);
         when(closureService.isDateClosed(today)).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(true);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(0);
 
@@ -377,7 +417,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(1001L, today)).thenReturn(false);
         when(closureService.isDateClosed(today)).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(false);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(16); // 16 minutes late
 
@@ -503,7 +551,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(1001L, today)).thenReturn(false);
         when(closureService.isDateClosed(today)).thenReturn(false);
-        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(testSchedule);
+        // Use schedule with late end time to allow check-in at any time
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59))
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         when(calculationService.isWithinGracePeriod(any(), any())).thenReturn(true);
         when(calculationService.calculateMinutesLate(any(), any())).thenReturn(0);
 
@@ -540,6 +596,15 @@ class AttendanceIntegrationTest {
         when(projectRepository.findById(101L)).thenReturn(Optional.of(testProject));
         when(attendanceRepository.hasCheckedInToday(1001L, today)).thenReturn(false);
         when(closureService.isDateClosed(today)).thenReturn(false);
+        // Mock schedule with late end time to allow check-in at any time (schedule validation happens before GPS)
+        TimeSchedule lateSchedule = TimeSchedule.builder()
+                .scheduleId(1L)
+                .scheduledStartTime(LocalTime.of(8, 0))
+                .scheduledEndTime(LocalTime.of(23, 59)) // Late end time to allow check-in at any time
+                .requiredHours(new BigDecimal("8.00"))
+                .gracePeriodMinutes(15)
+                .build();
+        when(calculationService.findApplicableSchedule(any(), any())).thenReturn(lateSchedule);
         
         // GPS validation will fail because coordinates are outside 50m radius
         // The exception is thrown before save(), so no need to mock save
