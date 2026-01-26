@@ -182,23 +182,12 @@ public class SchemaMigration implements CommandLineRunner {
 
                         } else {
                                 // Ensure existing admin user is linked to the admin employee
-                                // FORCE RESET: Unconditionally set password to 'admin123' to fix login issues
-                                log.info("Updating admin user linkage and FORCING password to 'admin123'...");
-                                System.out.println("\n\n*** ADMIN PASSWORD RESET TO 'admin123' ***\n\n");
-
-                                String newDefaultHash = passwordEncoder.encode("admin123");
+                                log.info("Updating admin user linkage...");
 
                                 // 1. Update linkage and activation
                                 jdbcTemplate.update(
                                                 "UPDATE user_accounts SET employee_no = ?, is_active = 'Y' WHERE username = 'admin'",
                                                 adminEmployeeNo);
-
-                                // 2. FORCE update password
-                                jdbcTemplate.update(
-                                                "UPDATE user_accounts SET password_hash = ? WHERE username = 'admin'",
-                                                newDefaultHash);
-
-                                log.info("Admin password forced to 'admin123'");
                         }
 
                         // --- 2. Superadmin User Setup ---
@@ -252,22 +241,13 @@ public class SchemaMigration implements CommandLineRunner {
                                 log.info("Superadmin user created and linked to employee: {}", superAdminEmployeeNo);
                         } else {
                                 // Ensure existing superadmin user is linked to the superadmin employee
-                                // FORCE RESET: Unconditionally set password to 'admin123' to fix login issues
-                                log.info("Updating superadmin user linkage and FORCING password to 'admin123'...");
-
-                                String newDefaultHash = passwordEncoder.encode("admin123");
+                                log.info("Updating superadmin user linkage...");
 
                                 // 1. Update linkage and activation
                                 jdbcTemplate.update(
                                                 "UPDATE user_accounts SET employee_no = ?, is_active = 'Y' WHERE username = 'superadmin'",
                                                 superAdminEmployeeNo);
 
-                                // 2. FORCE update password
-                                jdbcTemplate.update(
-                                                "UPDATE user_accounts SET password_hash = ? WHERE username = 'superadmin'",
-                                                newDefaultHash);
-
-                                log.info("Superadmin password forced to 'admin123'");
                                 log.info("Superadmin user linked to employee: {}", superAdminEmployeeNo);
                         }
 
