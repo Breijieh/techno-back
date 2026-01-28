@@ -157,7 +157,7 @@ public class SchemaMigration implements CommandLineRunner {
                                                 "\u0645\u062f\u064a\u0631 \u0627\u0644\u0646\u0638\u0627\u0645",
                                                 "1000000000", "Saudi",
                                                 "S", java.sql.Date.valueOf(java.time.LocalDate.now()), "ACTIVE",
-                                                "TECHNO", 10000.00,
+                                                "TECHNO", 0.00,
                                                 "admin@technoerp.com", "0500000000");
                                 log.info("System Administrator employee created successfully");
                         }
@@ -211,7 +211,7 @@ public class SchemaMigration implements CommandLineRunner {
                                                 "1000000001",
                                                 "Saudi",
                                                 "S", java.sql.Date.valueOf(java.time.LocalDate.now()), "ACTIVE",
-                                                "TECHNO", 20000.00,
+                                                "TECHNO", 0.00,
                                                 "superadmin@technoerp.com", "0500000001");
                                 log.info("Super System Administrator employee created successfully");
                         }
