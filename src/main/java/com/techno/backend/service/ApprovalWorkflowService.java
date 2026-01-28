@@ -107,6 +107,20 @@ public class ApprovalWorkflowService {
             Long employeeNo, Long deptCode, Long projectCode) {
         log.info("Moving to next approval level for type: {}, current level: {}", requestType, currentLevel);
 
+        // Check if current user is ADMIN - Immediate Approval Bypass
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+
+        if (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            log.info("Admin user bypassing remaining approval levels. Request fully approved.");
+            return ApprovalInfo.builder()
+                    .nextApproval(null)
+                    .nextAppLevel(null)
+                    .transStatus("A") // Fully approved
+                    .build();
+        }
+
         List<RequestsApprovalSet> approvalChain = getApprovalChain(requestType, deptCode, projectCode);
 
         // Find current level in chain
