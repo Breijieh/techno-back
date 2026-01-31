@@ -72,8 +72,13 @@ public interface EmpMonthlyAllowanceRepository extends JpaRepository<EmpMonthlyA
         * @param pageable    Pagination parameters
         * @return Page of allowance records
         */
+       /**
+        * Find all allowance records filtered to TECHNO contract employees only.
+        */
        @Query("SELECT a FROM EmpMonthlyAllowance a " +
-                     "WHERE a.isDeleted = 'N' " +
+                     "JOIN Employee e ON a.employeeNo = e.employeeNo " +
+                     "WHERE e.empContractType = 'TECHNO' " +
+                     "AND a.isDeleted = 'N' " +
                      "AND (:transStatus IS NULL OR a.transStatus = :transStatus) " +
                      "AND (:employeeNo IS NULL OR a.employeeNo = :employeeNo) " +
                      "AND a.transactionDate >= :startDate " +

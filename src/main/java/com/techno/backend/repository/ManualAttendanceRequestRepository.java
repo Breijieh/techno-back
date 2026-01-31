@@ -23,65 +23,74 @@ import java.util.Optional;
 @Repository
 public interface ManualAttendanceRequestRepository extends JpaRepository<ManualAttendanceRequest, Long> {
 
-    /**
-     * Find all manual attendance requests for a specific employee
-     */
-    Page<ManualAttendanceRequest> findByEmployeeNo(Long employeeNo, Pageable pageable);
+       /**
+        * Find all manual attendance requests for a specific employee
+        */
+       Page<ManualAttendanceRequest> findByEmployeeNo(Long employeeNo, Pageable pageable);
 
-    /**
-     * Find requests by employee and status
-     */
-    Page<ManualAttendanceRequest> findByEmployeeNoAndTransStatus(Long employeeNo, String transStatus, Pageable pageable);
+       /**
+        * Find requests by employee and status
+        */
+       Page<ManualAttendanceRequest> findByEmployeeNoAndTransStatus(Long employeeNo, String transStatus,
+                     Pageable pageable);
 
-    /**
-     * Find all pending requests (status = 'N')
-     */
-    @Query("SELECT r FROM ManualAttendanceRequest r WHERE r.transStatus = 'N' ORDER BY r.requestDate ASC")
-    List<ManualAttendanceRequest> findAllPendingRequests();
+       /**
+        * Find all pending requests (status = 'N')
+        */
+       @Query("SELECT r FROM ManualAttendanceRequest r WHERE r.transStatus = 'N' ORDER BY r.requestDate ASC")
+       List<ManualAttendanceRequest> findAllPendingRequests();
 
-    /**
-     * Find pending requests for a specific approver
-     */
-    @Query("SELECT r FROM ManualAttendanceRequest r WHERE r.nextApproval = :approverId AND r.transStatus = 'N' ORDER BY r.requestDate ASC")
-    List<ManualAttendanceRequest> findPendingRequestsByApprover(@Param("approverId") Long approverId);
+       /**
+        * Find pending requests for a specific approver
+        */
+       @Query("SELECT r FROM ManualAttendanceRequest r WHERE r.nextApproval = :approverId AND r.transStatus = 'N' ORDER BY r.requestDate ASC")
+       List<ManualAttendanceRequest> findPendingRequestsByApprover(@Param("approverId") Long approverId);
 
-    /**
-     * Find request by employee and attendance date (for duplicate checking)
-     */
-    Optional<ManualAttendanceRequest> findByEmployeeNoAndAttendanceDate(Long employeeNo, LocalDate attendanceDate);
+       /**
+        * Find request by employee and attendance date (for duplicate checking)
+        */
+       Optional<ManualAttendanceRequest> findByEmployeeNoAndAttendanceDate(Long employeeNo, LocalDate attendanceDate);
 
-    /**
-     * Find non-rejected request by employee and attendance date
-     * Used to check if employee already has a pending or approved request for the date
-     * Rejected requests are excluded to allow resubmission
-     */
-    @Query("SELECT r FROM ManualAttendanceRequest r WHERE r.employeeNo = :employeeNo " +
-           "AND r.attendanceDate = :attendanceDate AND r.transStatus != 'R'")
-    Optional<ManualAttendanceRequest> findNonRejectedRequestByEmployeeAndDate(
-            @Param("employeeNo") Long employeeNo,
-            @Param("attendanceDate") LocalDate attendanceDate);
+       /**
+        * Find non-rejected request by employee and attendance date
+        * Used to check if employee already has a pending or approved request for the
+        * date
+        * Rejected requests are excluded to allow resubmission
+        */
+       @Query("SELECT r FROM ManualAttendanceRequest r WHERE r.employeeNo = :employeeNo " +
+                     "AND r.attendanceDate = :attendanceDate AND r.transStatus != 'R'")
+       Optional<ManualAttendanceRequest> findNonRejectedRequestByEmployeeAndDate(
+                     @Param("employeeNo") Long employeeNo,
+                     @Param("attendanceDate") LocalDate attendanceDate);
 
-    /**
-     * Find all manual attendance request records with optional filters for status, employee, and date range.
-     *
-     * @param transStatus Transaction status (N/A/R) - optional
-     * @param employeeNo Employee number - optional
-     * @param startDate Start date (inclusive, optional) - filters by attendanceDate
-     * @param endDate End date (inclusive, optional) - filters by attendanceDate
-     * @param pageable Pagination parameters
-     * @return Page of manual attendance request records
-     */
-    @Query("SELECT r FROM ManualAttendanceRequest r WHERE " +
-           "(:transStatus IS NULL OR r.transStatus = :transStatus) AND " +
-           "(:employeeNo IS NULL OR r.employeeNo = :employeeNo) AND " +
-           "(:startDate IS NULL OR r.attendanceDate >= :startDate) AND " +
-           "(:endDate IS NULL OR r.attendanceDate <= :endDate) " +
-           "ORDER BY r.requestDate DESC, r.requestId DESC")
-    Page<ManualAttendanceRequest> findAllWithFilters(
-            @Param("transStatus") String transStatus,
-            @Param("employeeNo") Long employeeNo,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            Pageable pageable);
+       /**
+        * Find all manual attendance request records with optional filters for status,
+        * employee, and date range.
+        *
+        * @param transStatus Transaction status (N/A/R) - optional
+        * @param employeeNo  Employee number - optional
+        * @param startDate   Start date (inclusive, optional) - filters by
+        *                    attendanceDate
+        * @param endDate     End date (inclusive, optional) - filters by attendanceDate
+        * @param pageable    Pagination parameters
+        * @return Page of manual attendance request records
+        */
+       /**
+        * Find all manual attendance requests filtered to TECHNO contract employees
+        * only.
+        */
+       @Query("SELECT r FROM ManualAttendanceRequest r " +
+                     "JOIN Employee e ON r.employeeNo = e.employeeNo " +
+                     "WHERE e.empContractType = 'TECHNO' AND " +
+                     "(:transStatus IS NULL OR r.transStatus = :transStatus) AND " +
+                     "(:employeeNo IS NULL OR r.employeeNo = :employeeNo) AND " +
+                     "(:startDate IS NULL OR r.attendanceDate >= :startDate) AND " +
+                     "(:endDate IS NULL OR r.attendanceDate <= :endDate) " +
+                     "ORDER BY r.requestDate DESC, r.requestId DESC")
+       Page<ManualAttendanceRequest> findAllWithFilters(
+                     @Param("transStatus") String transStatus,
+                     @Param("employeeNo") Long employeeNo,
+                     @Param("startDate") LocalDate startDate,
+                     @Param("endDate") LocalDate endDate,
+                     Pageable pageable);
 }
-

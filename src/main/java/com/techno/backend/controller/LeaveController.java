@@ -316,7 +316,8 @@ public class LeaveController {
                 log.info("GET /leaves/{}", leaveId);
 
                 EmployeeLeave leave = leaveRepository.findById(leaveId)
-                                .orElseThrow(() -> new RuntimeException("Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + leaveId));
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + leaveId));
 
                 log.info("Retrieved leave details: ID={}, Employee={}, Status={}",
                                 leaveId, leave.getEmployeeNo(), leave.getTransStatus());
@@ -339,7 +340,8 @@ public class LeaveController {
                 log.info("GET /leaves/{}/timeline", leaveId);
 
                 EmployeeLeave leave = leaveRepository.findById(leaveId)
-                                .orElseThrow(() -> new RuntimeException("Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + leaveId));
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Ø·Ù„Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø²Ø© ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + leaveId));
 
                 // Get employee details for department/project code
                 Employee employee = employeeRepository.findById(leave.getEmployeeNo())
@@ -376,7 +378,8 @@ public class LeaveController {
 
                 // Get employee for name
                 Employee employee = employeeRepository.findById(employeeNo)
-                                .orElseThrow(() -> new RuntimeException("Ø§Ù„Ù…ÙˆØ¸Ù ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + employeeNo));
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Ø§Ù„Ù…ÙˆØ¸Ù ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + employeeNo));
 
                 BigDecimal balance = leaveService.getLeaveBalance(employeeNo);
 
@@ -488,7 +491,8 @@ public class LeaveController {
 
                 // Get manager details
                 Employee manager = employeeRepository.findById(managerNo)
-                                .orElseThrow(() -> new RuntimeException("Ø§Ù„Ù…Ø¯ÙŠØ± ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + managerNo));
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Ø§Ù„Ù…Ø¯ÙŠØ± ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯: " + managerNo));
 
                 // Get all pending leaves for this manager (simplified version)
                 List<EmployeeLeave> teamLeaves = leaveService.getPendingLeavesForApprover(managerNo);
@@ -510,16 +514,17 @@ public class LeaveController {
         }
 
         /**
-         * One-time initialization of leave balances for all employees.
-         * Sets balance to 30 days for everyone.
+         * Add 30 days annual leave allowance to all active employees.
+         * This ADDS to existing balance (supports carryover).
+         * Example: Employee with 15 days remaining gets 15 + 30 = 45 days.
          */
         @PostMapping("/init-balances")
         @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<ApiResponse<Void>> initializeBalances() {
-                log.info("POST /api/leaves/init-balances - Initializing all employee balances to 30 days");
-                leaveAccrualService.initializeExistingEmployees(BigDecimal.valueOf(30.0));
+                log.info("POST /api/leaves/init-balances - Adding 30 days annual allowance to all active employees");
+                leaveAccrualService.addAnnualAllowanceToEmployees(BigDecimal.valueOf(30.0));
                 return ResponseEntity
-                                .ok(ApiResponse.success("ØªÙ… ØªÙ‡ÙŠØ¦Ø© Ø¬Ù…ÙŠØ¹ Ø£Ø±ØµØ¯Ø© Ø¥Ø¬Ø§Ø²Ø§Øª Ø§Ù„Ù…ÙˆØ¸ÙÙŠÙ† Ø¥Ù„Ù‰ 30 ÙŠÙˆÙ…Ø§Ù‹", null));
+                                .ok(ApiResponse.success("تم إضافة 30 يومًا لجميع أرصدة إجازات الموظفين النشطين", null));
         }
 
         // ==================== Helper Methods ====================
@@ -721,4 +726,3 @@ public class LeaveController {
                         List<LeaveDetailsResponse> teamLeaveRequests) {
         }
 }
-

@@ -152,8 +152,9 @@ public class SchemaMigration implements CommandLineRunner {
                                                                 +
                                                                 "employee_category, hire_date, employment_status, emp_contract_type, monthly_salary, "
                                                                 +
-                                                                "email, mobile, created_date, modified_date) " +
-                                                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                                                                "email, mobile, leave_balance_days, created_date, modified_date) "
+                                                                +
+                                                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 30.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
                                                 "\u0645\u062f\u064a\u0631 \u0627\u0644\u0646\u0638\u0627\u0645",
                                                 "1000000000", "Saudi",
                                                 "S", java.sql.Date.valueOf(java.time.LocalDate.now()), "ACTIVE",
@@ -205,8 +206,9 @@ public class SchemaMigration implements CommandLineRunner {
                                                                 +
                                                                 "employee_category, hire_date, employment_status, emp_contract_type, monthly_salary, "
                                                                 +
-                                                                "email, mobile, created_date, modified_date) " +
-                                                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                                                                "email, mobile, leave_balance_days, created_date, modified_date) "
+                                                                +
+                                                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 30.0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
                                                 "\u0645\u062f\u064a\u0631 \u0627\u0644\u0646\u0638\u0627\u0645 \u0627\u0644\u0641\u0627\u0626\u0642",
                                                 "1000000001",
                                                 "Saudi",

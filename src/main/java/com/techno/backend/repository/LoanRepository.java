@@ -100,7 +100,12 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
         * @param pageable    Pagination parameters
         * @return Page of loan records
         */
-       @Query("SELECT l FROM Loan l WHERE " +
+       /**
+        * Find all loan records filtered to TECHNO contract employees only.
+        */
+       @Query("SELECT l FROM Loan l " +
+                     "JOIN Employee e ON l.employeeNo = e.employeeNo " +
+                     "WHERE e.empContractType = 'TECHNO' AND " +
                      "(:transStatus IS NULL OR l.transStatus = :transStatus) AND " +
                      "(:employeeNo IS NULL OR l.employeeNo = :employeeNo) AND " +
                      "(:startDate IS NULL OR l.requestDate >= :startDate) AND " +

@@ -104,9 +104,14 @@ public interface LoanInstallmentRepository extends JpaRepository<LoanInstallment
         * @param pageable      Pagination parameters
         * @return Page of installments
         */
+       /**
+        * Find all installments filtered to TECHNO contract employees only.
+        */
        @Query(value = "SELECT li.* FROM loan_installments li " +
                      "JOIN loans l ON li.loan_id = l.loan_id " +
-                     "WHERE (CAST(:employeeNo AS bigint) IS NULL OR l.employee_no = CAST(:employeeNo AS bigint)) AND " +
+                     "JOIN employees_details e ON l.employee_no = e.employee_no " +
+                     "WHERE e.emp_contract_type = 'TECHNO' AND " +
+                     "(CAST(:employeeNo AS bigint) IS NULL OR l.employee_no = CAST(:employeeNo AS bigint)) AND " +
                      "(CAST(:loanId AS bigint) IS NULL OR li.loan_id = CAST(:loanId AS bigint)) AND " +
                      "(CAST(:paymentStatus AS varchar) IS NULL OR li.payment_status = CAST(:paymentStatus AS varchar)) AND "
                      +
@@ -114,7 +119,9 @@ public interface LoanInstallmentRepository extends JpaRepository<LoanInstallment
                      "(CAST(:endDate AS date) IS NULL OR li.due_date <= CAST(:endDate AS date))", nativeQuery = true, countQuery = "SELECT COUNT(*) FROM loan_installments li "
                                    +
                                    "JOIN loans l ON li.loan_id = l.loan_id " +
-                                   "WHERE (CAST(:employeeNo AS bigint) IS NULL OR l.employee_no = CAST(:employeeNo AS bigint)) AND "
+                                   "JOIN employees_details e ON l.employee_no = e.employee_no " +
+                                   "WHERE e.emp_contract_type = 'TECHNO' AND " +
+                                   "(CAST(:employeeNo AS bigint) IS NULL OR l.employee_no = CAST(:employeeNo AS bigint)) AND "
                                    +
                                    "(CAST(:loanId AS bigint) IS NULL OR li.loan_id = CAST(:loanId AS bigint)) AND " +
                                    "(CAST(:paymentStatus AS varchar) IS NULL OR li.payment_status = CAST(:paymentStatus AS varchar)) AND "

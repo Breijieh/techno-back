@@ -99,7 +99,12 @@ public interface EmployeeLeaveRepository extends JpaRepository<EmployeeLeave, Lo
         * @param pageable    Pagination parameters
         * @return Page of leave records
         */
-       @Query("SELECT l FROM EmployeeLeave l WHERE " +
+       /**
+        * Find all leave records filtered to TECHNO contract employees only.
+        */
+       @Query("SELECT l FROM EmployeeLeave l " +
+                     "JOIN Employee e ON l.employeeNo = e.employeeNo " +
+                     "WHERE e.empContractType = 'TECHNO' AND " +
                      "(:transStatus IS NULL OR l.transStatus = :transStatus) AND " +
                      "(:employeeNo IS NULL OR l.employeeNo = :employeeNo) AND " +
                      "(:startDate IS NULL OR l.leaveFromDate >= :startDate) AND " +

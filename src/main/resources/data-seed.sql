@@ -137,6 +137,27 @@ INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_sy
 VALUES (34, 'حسم أمانة', 'D', 'Y', 'Y', CURRENT_TIMESTAMP)
 ON CONFLICT (type_code) DO NOTHING;
 
+-- Custom deduction types (NOT system-generated, for manual entry)
+INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
+VALUES (35, 'خصم مخصص', 'D', 'N', 'Y', CURRENT_TIMESTAMP)
+ON CONFLICT (type_code) DO NOTHING;
+
+INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
+VALUES (36, 'خصم تأديبي', 'D', 'N', 'Y', CURRENT_TIMESTAMP)
+ON CONFLICT (type_code) DO NOTHING;
+
+INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
+VALUES (37, 'خصم نقص', 'D', 'N', 'Y', CURRENT_TIMESTAMP)
+ON CONFLICT (type_code) DO NOTHING;
+
+INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
+VALUES (38, 'خصم سداد', 'D', 'N', 'Y', CURRENT_TIMESTAMP)
+ON CONFLICT (type_code) DO NOTHING;
+
+INSERT INTO transactions_types (type_code, type_name, allowance_deduction, is_system_generated, is_active, created_date)
+VALUES (39, 'خصم متنوع', 'D', 'N', 'Y', CURRENT_TIMESTAMP)
+ON CONFLICT (type_code) DO NOTHING;
+
 -- ====================================================================
 -- Salary Breakdown Percentages Seed Data
 -- As per DOCUMNET.MD Section 2.4 - Salary Structure

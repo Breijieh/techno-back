@@ -63,17 +63,61 @@ public class LeaveAccrualService {
     }
 
     /**
-     * One-time method to initialize existing employees with a starting balance.
-     * Use with caution.
+     * Add annual leave allowance to all active employees.
+     * Adds the specified amount to existing balance (supports carryover).
+     * For example: if employee has 15 days remaining and you add 30, they get 45.
      */
     @Transactional
-    public void initializeExistingEmployees(BigDecimal startingBalance) {
-        log.info("Initializing existing employees with leave balance: {}", startingBalance);
-        List<Employee> employees = employeeRepository.findAll();
-        for (Employee employee : employees) {
-            employee.setLeaveBalanceDays(startingBalance);
+    public void addAnnualAllowanceToEmployees(BigDecimal allowanceAmount) {
+        log.info("Adding {} days annual leave allowance to all active employees", allowanceAmount);
+
+        List<Employee> activeEmployees = employeeRepository.findAllActiveEmployees();
+        if (activeEmployees.isEmpty()) {
+            log.info("No active employees found to add allowance.");
+            return;
         }
-        employeeRepository.saveAll(employees);
-        log.info("Initialized {} employees.", employees.size());
+
+        int count = 0;
+        for (Employee employee : activeEmployees) {
+            BigDecimal currentBalance = employee.getLeaveBalanceDays() != null
+                    ? employee.getLeaveBalanceDays()
+                    : BigDecimal.ZERO;
+
+            BigDecimal newBalance = currentBalance.add(allowanceAmount);
+            employee.setLeaveBalanceDays(newBalance);
+
+            log.debug("Employee {}: {} + {} = {} days",
+                    employee.getEmployeeNo(), currentBalance, allowanceAmount, newBalance);
+            count++;
+        }
+
+        employeeRepository.saveAll(activeEmployees);
+        log.info("Added {} days allowance to {} active employees.", allowanceAmount, count);
+    }
+
+    /**
+     * Initialize employees who have null/zero balance to a starting value.
+     * Use this for new employees who weren't properly initialized.
+     */
+    @Transactional
+    public void initializeEmployeesWithZeroBalance(BigDecimal startingBalance) {
+        log.info("Initializing employees with zero/null balance to: {}", startingBalance);
+
+        List<Employee> employees = employeeRepository.findAllActiveEmployees();
+        int count = 0;
+
+        for (Employee employee : employees) {
+            BigDecimal currentBalance = employee.getLeaveBalanceDays();
+            if (currentBalance == null || currentBalance.compareTo(BigDecimal.ZERO) == 0) {
+                employee.setLeaveBalanceDays(startingBalance);
+                count++;
+                log.debug("Initialized employee {} with {} days", employee.getEmployeeNo(), startingBalance);
+            }
+        }
+
+        if (count > 0) {
+            employeeRepository.saveAll(employees);
+        }
+        log.info("Initialized {} employees with zero balance.", count);
     }
 }
